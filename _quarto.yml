@@ -1,0 +1,73 @@
+editor: source
+
+execute:
+  cache: false
+  freeze: false
+
+project:
+  type: website
+  output-dir: docs
+  render: [index.qmd]
+  post-render: "R/_post-render.R"
+
+title: "SISVAN Data Analysis"
+author: "Arthur R. Magalhães & Daniel Vartanian"
+keyword: >
+  data science, data analysis, rstats, nutrition, malnutrition, obesity,
+  stunting, wasting, underweight, overweight, food systems, sustainable eating,
+  global syndemic, climate change, sisvan, worldclim, brazil
+date: today
+date-format: "YYYY-MM-DD"
+
+website:
+  open-graph: true
+  favicon: images/favicon.png
+  repo-url: https://github.com/sustentarea/gs-data-analysis-report-3/
+  site-url: https://sustentarea.github.io/gs-data-analysis-report-3/
+  issue-url: https://github.com/sustentarea/gs-data-analysis-report-3/issues/
+  repo-branch: main
+  repo-actions: [edit, source, issue]
+  search: false
+  navbar:
+    title: false
+    background: dark
+    right:
+      - icon: github
+        href: https://github.com/sustentarea/gs-data-analysis-report-3
+        aria-label: GitHub
+  comments:
+    hypothesis:
+      theme: clean
+      openSidebar: false
+
+lightbox:
+  match: auto
+  effect: fade
+  desc-position: bottom
+  loop: false
+
+format:
+  html:
+    toc: true
+    toc-depth: 5
+    toc-location: right
+    locale: en
+    language: en-us
+    code-fold: true
+    code-link: true
+    code-tools: true
+    df-print: paged
+    fig-align: center
+    cap-location: top
+    lightbox: true
+    callout-appearance: simple
+    csl: csl/english-apa-author-date.csl
+    theme: [cosmo, scss/styles.scss, brand]
+    link-external-icon: false
+    link-external-newwindow: false
+    other-links:
+      - text: Sustentarea website
+        href: https://www.fsp.usp.br/sustentarea
+
+google-scholar: false
+bibliography: references.bib

@@ -1,0 +1,12 @@
+/*-- scss:defaults --*/
+
+// See: <https://quarto.org/docs/output-formats/html-themes.htm>.
+// See: <https://quarto.org/docs/authoring/brand.html>.
+
+$toc-font-size: 1em !default;
+
+/*-- scss:rules --*/
+
+quarto-float-caption-top {
+  margin-bottom: 1.5em;
+}
