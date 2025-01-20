@@ -2,14 +2,17 @@
 
 <!-- badges: start -->
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![License: MIT](https://aimg.shields.io/badge/license-MIT-green)](https://choosealicense.com/licenses/mit/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
+
+> [!IMPORTANT]
+> This analysis is currently incomplete due to missing data. Arthur is actively working to locate the missing information. The report will be updated as soon as possible.
 
 ## Overview
 
 🍚🌾🌱🌍🇧🇷📊📈🚜🌽💧☀️🌦️👩‍🌾👨‍🌾🌳📅
 
-This repository contains a report focuses on exploring associations between data from Brazil's Food and Nutrition Surveillance System ([SISVAN](https://sisaps.saude.gov.br/sisvan/)) and climate variables.
+This repository contains a report that explores associations between data from Brazil's Food and Nutrition Surveillance System (SISVAN) ([link to SISVAN](https://sisaps.saude.gov.br/sisvan/)) and climate variables.
 
 The report is available [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
 
@@ -34,7 +37,7 @@ A BibTeX entry for LaTeX users is
 
 ```         
 @techreport{magalhaes2024,
-  title = {Global syndemic data analysis report 3: SISVAN data analysis},
+  title = {Global syndemic project: data analysis report 3 - SISVAN data analysis},
   author = {{Daniel Vartanian} and {Arthur Ramalho Magalhães}},
   year = {2025},
   address = {São Paulo},
@@ -51,7 +54,7 @@ A BibTeX entry for LaTeX users is
     <td width="30%">
       <br>
       <p align="center">
-        <a href="https://www.gov.br/cnpq/"><img src="images/sustentarea-logo.png" width="120em"/></a>
+        <a href="https://www.gov.br/cnpq/"><img src="images/sustentarea-icon-rgb-150-dpi.png" width="120em"/></a>
       </p>
       <br>
     </td>
