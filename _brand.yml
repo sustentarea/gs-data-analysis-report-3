@@ -42,6 +42,8 @@ color:
     # Grayscale
     white: "#FFFFFF"
     grey: "#7A7A7A"
+    grey-950: "#F1F1F1" # get_brand_color_tint(950, "grey")
+    grey-975: "#F8F8F8" # get_brand_color_tint(950, "grey")
     black: "#272B33"
   background: white
   primary: green
@@ -67,20 +69,20 @@ typography:
       source: google
   base: # color: gray
     family: Poppins
-    size: 1rem
-    line-height: 1.5
+    size: 0.9rem
+    line-height: 2
     weight: normal
   headings: # h1 3rem; h2 1.6rem;
     family: Poppins
     color: brown
-    line-height: 1.5
-    weight: normal
+    line-height: 2
+    weight: bold
   monospace: DM Mono
   monospace-inline:
     color: green
-    background-color: gray
+    background-color: grey-975
   monospace-block:
-    background-color: gray
+    background-color: grey-975
   link:
     color: green
     decoration: underline

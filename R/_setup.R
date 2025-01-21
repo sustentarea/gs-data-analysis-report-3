@@ -108,3 +108,25 @@ ggplot2::theme_set(
       legend.ticks = ggplot2::element_line(color = "white")
     )
 )
+
+# thematic::thematic_on(
+#   bg = NULL,
+#   fg = get_brand_color("grey"),
+#   accent = get_brand_color("red"),
+#   font = "dm-sans"
+# )
+
+# Run `rbbt` -----
+
+# (2024-08-25)
+# This function should work with any version of BetterBibTeX (BBT) for Zotero.
+# Verify if @wmoldham PR was merged in the `rbbt` package (see issue #47
+# <https://github.com/paleolimbot/rbbt/issues/47>). If not, install `rbbt`
+# from @wmoldham fork `renv::install("wmoldham/rbbt")`.
+
+rutils:::bbt_write_quarto_bib(
+  bib_file = here::here("references.bib"),
+  dir = c("."),
+  pattern = "\\.qmd$",
+  wd = here::here()
+)

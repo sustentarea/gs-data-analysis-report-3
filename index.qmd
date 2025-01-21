@@ -5,37 +5,89 @@
 source(here::here("R", "_setup.R"))
 ```
 
+## Overview
+
+This document explore possible associations between undertrition in children with the Standardised Precipitation Evapotranspiration Index (SPEI) of municipalities in Brazil durting 2008-2019 period. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
+
+::: {.callout-warning}
+Please note that this is a preliminary report intended to support decision-making and may not include all the details of the analysis.
+:::
+
+## Methods
+
+### Approach and procedure method
+
+The analysis will rely solely on a visual inspection of the data. If necessary, additional analysis and updates will be incorporated into this report later.
+
+### Source of data/information
+
+The data used in this analysis have as sources:
+
+- The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita.
+- Brazil's Food and Nutrition Surveillance System (SISVAN) ([link to SISVAN](https://sisaps.saude.gov.br/sisvan/), for data on malnutrition.
+- [WorldClim](https://worldclim.org/data/index.html), for data on bioclimatic variables, which allowed us to calculate the Standardised Precipitation Evapotranspiration Index (SPEI) for municipalities in Brazil.
+
+### Data wrangling
+
+The data wrangling and analysis followed the data science framework outlined by Hadley Wickham et al. [@wickham2023e], as illustrated in [@fig-wickham-at-al-2024-figure-1].
+
+::: {#fig-wickham-at-al-2024-figure-1}
+![](images/wickham-at-al-2024-figure-1.png){width=75%}
+
+[Source: Reproduced from @wickham2023e.]{.legend}
+
+Model of the data science process created by Wickham, Çetinkaya-Runde, and Grolemund [-@wickham2023e].
+:::
+
+All the analyses are 100% reproducible and can be run again at any time. See the [README](https://github.com/sustentarea/gs-data-analysis-report-2/blob/main/README.md) file on the code repository to learn how to run them.
+
 ## Setting the Enviroment
 
 ```{r}
 #| eval: false
 
 library(beepr)
+library(cli)
 library(dplyr)
 library(ggplot2)
+library(glmmTMB)
 library(janitor)
+library(lme4)
+library(magrittr)
 library(mgcv)
+library(patchwork)
 library(polyglotr)
 library(prettycheck) # github.com/danielvartan/prettycheck
 library(readxl)
+library(stats)
 library(stringr)
 library(tidyr)
 ```
 
 ```{r}
+#| include: false
+
 library(magrittr)
+library(mgcv)
 library(ggplot2)
 ```
 
+## Loading functions
+
 ```{r}
+source(here::here("R", "coef_mean.R"))
+source(here::here("R", "model_gamm_misfs.R"))
+source(here::here("R", "plot_gamm.R"))
 source(here::here("R", "utils.R"))
 source(here::here("R", "utils-plots.R"))
 ```
 
-## Loading and Tidying Data
+## Importing and Tidying the Data
+
+### GDP Data
 
 ```{r}
-pib_data <- 
+gdp_data <- 
   here::here("data", "PIB dos Municípios - base de dados 2010-2021.xlsx") |>
   readxl::read_excel(col_types = "text") |>
   janitor::clean_names() |>
@@ -59,8 +111,10 @@ pib_data <-
     gdp_per_capita = as.numeric(gdp_per_capita)
   )
 
-pib_data
+gdp_data
 ```
+
+### Nutrition Data
 
 ```{r}
 nutrition_data <-
@@ -69,7 +123,9 @@ nutrition_data <-
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::everything(),
-      .fns = ~ iconv(.x, from = "UTF-8", to = "iso-8859-1")
+      .fns = ~ 
+        iconv(.x, from = "UTF-8", to = "iso-8859-1") |>
+        readr::parse_guess()
     )
   ) |>
   janitor::clean_names() |>
@@ -79,162 +135,181 @@ nutrition_data <-
   ) |>
   dplyr::mutate(
     year = as.integer(year),
-    municipality_code = as.integer(municipality_code)
+    municipality_code = as.integer(municipality_code),
+    cobrs = as.numeric(cobrs)
   )
 
 nutrition_data
 ```
 
-```{r}
-merged_data <-
-  pib_data |>
-  dplyr::full_join(
-    y = nutrition_data,
-    by = c("municipality_code", "year")
-  )
-
-merged_data
-```
+### SPEI Data
 
 ```{r}
-spei <- read.csv("./merge sisvan extreme events/spei_Extreme_drought_event_municipality_year2.csv")
-str(spei)
-names(spei)
-```
-
-```{r}
-# Step 1: Select relevant columns
-selected_data <- spei %>%
-  select(municipality_code, starts_with("SPEI_12m_20"))
-
-# Step 2: Reshape the dataset into long format
-melted_data <- selected_data %>%
-  pivot_longer(
-    cols = starts_with("SPEI_12m_20"),  # Columns to melt
-    names_to = "year",                   # New column for years
-    values_to = "SPEI_12m"              # Values from the original columns
-  )
-
-# Step 3: Extract the year from the column names
-melted_data <- melted_data %>%
-  mutate(year = gsub("SPEI_12m_", "", year))  # Remove "SPEI_12m_" prefix to get the year
-
-# View the result
-head(melted_data)
-write.csv(melted_data, file="test_spei.csv")
-
-
-```
-
-```{r}
-# Step 4: Remove the last character from `municipality_code`
-melted_data <- 
-  melted_data |> 
+spei_data <- 
+  here::here("data", "spei_Extreme_drought_event_municipality_year2.csv") |>
+  readr::read_csv(col_types = readr::cols(.default = "c")) |>
+  janitor::clean_names() |>
+  dplyr::rename(
+    municipality_code = code_muni,
+    municipality_name = name_muni
+  ) |>
+  dplyr::select(
+    municipality_code, 
+    dplyr::starts_with("spei_12m_20")
+  ) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::starts_with("spei_12m_20"),
+      .fns = as.numeric
+    )
+  ) |>
+  tidyr::pivot_longer(
+    cols = starts_with("spei_12m_20"),
+    names_to = "year",
+    values_to = "spei_12m"
+  ) |>
   dplyr::mutate(
     municipality_code = 
-      substr(municipality_code, 1, nchar(as.character(municipality_code)) - 1),
-       year = as.integer(year)  
+      municipality_code |>
+      substr(1, nchar(as.character(municipality_code)) - 1) |>
+      as.integer(),
+    year = 
+      gsub("spei_12m_", "", year) |>
+      as.integer(),
   )
-
-melted_data <-
-  melted_data |>
-  dplyr::mutate(municipality_code = as.character(municipality_code))
-
-merged_data <-
-  merged_data |>
-  dplyr::mutate(municipality_code = as.character(municipality_code))
-
-# Ensure `year` columns are integers
-melted_data <- 
-  melted_data %>%
-  dplyr::mutate(year = as.integer(year))
-
-merged_data <- 
-  merged_data %>%
-  dplyr::mutate(year = as.integer(year))
-
-head(melted_data)
-head(merged_data)
-
-# Check for mismatches in `municipality_code` formatting
-all_equal(merged_data$municipality_code, melted_data$municipality_code)
-
-# Check for mismatches in `year` values
-unique(merged_data$year)
-unique(melted_data$year)
-
-# Step 5: Perform the left join
-final_data <- left_join(merged_data, melted_data, by = c("year", "municipality_code"))
-
-# View the merged data
-head(final_data)
-write.csv(final_data, file="merged_data_spei_new_2025.csv")
-
+  
+spei_data
 ```
 
-## Check for muncipalities with minimum 5% cover from sisvan
+### Analysis Data
 
 ```{r}
-smaller<- sum(final_data$COBRS < 0.05, na.rm = TRUE)
-count<- sum(final_data$COBRS > 1, na.rm = TRUE)
+data <- 
+  gdp_data |>
+  dplyr::full_join(
+    y = nutrition_data,
+    by = c("year", "municipality_code")
+  ) |>
+  dplyr::left_join(
+    spei_data,
+    by = c("year", "municipality_code")
+  )
 
-# Filter rows where COBRS > 1
-filtered_data <- final_data[final_data$COBRS > 1, ]
+data
+```
 
-# Alternatively, using dplyr
-library(dplyr)
-filtered_data <- final_data %>% filter(COBRS > 1)
+## Checking for Muncipalities With Minimum 5% Cover from SISVAN
 
-write.csv(filtered_data, file="data_above_100.csv")
+```{r}
+#| code-fold: false
 
+data |>
+  dplyr::pull(cobrs) %>%
+  sum(. < 0.05, na.rm = TRUE)
+```
 
-# Print the result
-cat("Number of values greater than 1 in COBRS:", smaller, "\n")
+```{r}
+#| code-fold: false
 
+data |>
+  dplyr::pull(cobrs) %>%
+  sum(. > 1, na.rm = TRUE)
+```
 
-#remove from data rows where cover from sisvan are smaller than 5%
-final_data <- final_data[final_data$COBRS >= 0.05, ]
+```{r}
+#| code-fold: false
 
+data <- 
+  data |>
+  dplyr::filter(cobrs >= 0.05)
+
+data
+```
+
+```{r}
+#| code-fold: false
+
+min(data$spei_12m)
+```
+
+```{r}
+#| code-fold: false
+
+max(data$spei_12m)
 ```
 
 ## Generalized Linear Mixed Model (GLMM)
 
-### MBEPR - Muito baixa estatura pra Idade
+### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
+
+::: {.callout-caution}
+See 
+<https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html>
+to learn more about the model warnings.
+:::
 
 ```{r}
-library(lme4)
-library(glmmTMB)
+#| code-fold: false
 
-MBEPR_model <- glmmTMB(
-  MBEPR ~ SPEI_12m + PIB_per_capita + (1 | year),
-  data = final_data,
-  family = betabinomial(link = "logit"),
-  control = glmmTMBControl(optimizer = optim, optArgs = list(method = "BFGS"))
+mbepr_model <- glmmTMB::glmmTMB(
+  mbepr ~ spei_12m + gdp_per_capita + (1 | year),
+  data = data,
+  family = glmmTMB::betabinomial(link = "logit"),
+  control = glmmTMB::glmmTMBControl(
+    optimizer = optim, 
+    optArgs = list(method = "BFGS")
+  )
 )
+
+mbepr_model
 ```
 
 ```{r}
-overdispersion_test <- sum(residuals(MBEPR_model, type = "pearson")^2) / MBEPR_model$df.residual
-cat("Overdispersion statistic:", overdispersion_test, "\n")
+overdispersion_test <- 
+  mbepr_model |>
+  stats::residuals(type = "pearson") %>%
+  `^`(2) %>%
+  `/`(mbepr_model$df.residual) |>
+  sum()
+```
+
+```{r}
+#| code-fold: false
+
+cli::cli_inform("Overdispersion statistic: {overdispersion_test}\n")
+
 if (overdispersion_test > 1.5) {
-  cat("There might still be overdispersion in the model.\n")
+  cli::cli_inform("There might still be overdispersion in the model.\n")
 }
-# Residuals vs. Fitted Values
-plot(MBEPR_model$fitted.values, residuals(MBEPR_model, type = "pearson"),
-     xlab = "Fitted Values", ylab = "Pearson Residuals",
-     main = "Residuals vs. Fitted")+
-abline(h = 0, col = "red")
 ```
 
 ```{r}
-final_data |>
-  ggplot2::ggplot(ggplot2::aes(x = SPEI_12m, y = MBEPR)) +
+dplyr::tibble(
+  fitted = stats::fitted(mbepr_model),
+  residuals = stats::residuals(mbepr_model, type = "pearson")
+) |>
+  ggplot2::ggplot(ggplot2::aes(x = fitted, y = residuals)) +
+  ggplot2::geom_point(alpha = 0.5) +
+  ggplot2::geom_hline(
+    yintercept = 0, 
+    color = get_brand_color("red")
+  ) +
+  ggplot2::labs(
+    x = "Fitted values",
+    y = "Pearson residuals",
+    title = "Residuals vs. Fitted"
+  )
+```
+
+```{r}
+data |>
+  ggplot2::ggplot(ggplot2::aes(x = spei_12m, y = mbepr)) +
   ggplot2::geom_point(alpha = 0.5) +
   ggplot2::geom_smooth(
     method = "glm", 
     method.args = list(family = "binomial"), 
     se = TRUE, 
-    color = "blue"
+    color = get_brand_color("red")
   ) +
   ggplot2::labs(
     x = "SPEI (12 months)",
@@ -244,1068 +319,642 @@ final_data |>
 ```
 
 ```{r}
-final_data |>
-  ggplot2::ggplot(ggplot2::aes(x = PIB_per_capita, y = MBEPR)) +
+data |>
+  tidyr::drop_na(gdp_per_capita, mbepr) |>
+  ggplot2::ggplot(ggplot2::aes(x = gdp_per_capita, y = mbepr)) +
   ggplot2::geom_point(alpha = 0.5) +
   ggplot2::geom_smooth(
     method = "glm", 
-    method.args = list(family = "binomial"), se = TRUE, color = "blue") +
+    method.args = list(family = "binomial"), 
+    se = TRUE, 
+    color = get_brand_color("red")
+  ) +
   ggplot2::labs(
-    x = "income per capta",
-    y = "Low stature for age",
-    title = "Relationship between Income (per capta) and MBEPR"
+    x = "GDP per capita",
+    y = "Very Short Stature for Age (MBEPR)",
+    title = "Relationship between GDP per capita and MBEPR"
   )
 ``` 
 
-### BEIPR- Baixa estatura para idade
+### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
 
 ```{r}
-BEIPR_model <- glmmTMB(
-  BEIPR ~ SPEI_12m * PIB_per_capita + (1 | year),
-  data = final_data,
-  family = betabinomial(link = "logit")
+#| code-fold: false
+
+beipr_model <- glmmTMB::glmmTMB(
+  beipr ~ spei_12m * gdp_per_capita + (1 | year),
+  data = data,
+  family = glmmTMB::betabinomial(link = "logit")
 )
-summary(MBEPR_model)
+
+beipr_model
 ```
 
-### MAPER - Magreza acentuada para estatura
+```{r}
+#| code-fold: false
+
+summary(beipr_model)
+```
+
+### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
 
 ```{r}
+#| code-fold: false
+
 maper_model <- glm(
-  MAPER ~ SPEI_12m * PIB_per_capita,
-  data = final_data,
+  maper ~ spei_12m * gdp_per_capita,
+  data = data,
   family = quasibinomial(link = "logit")
 )
+
+maper_model
+```
+
+```{r}
+#| code-fold: false
 
 summary(maper_model)
 ```
 
-### MPEPR = Magreza Por Estatura
+### MPEPR – Thinness for Height (Magreza Por Estatura)
 
 ```{r}
+#| code-fold: false
+
 mpepr_model <- glm(
-  MPEPR ~ SPEI_12m * PIB_per_capita,
-  data = final_data,
+  mpepr ~ spei_12m * gdp_per_capita,
+  data = data,
   family = quasibinomial(link = "logit")
 )
+
+mpepr_model
+```
+
+```{r}
+#| code-fold: false
 
 summary(mpepr_model)
 ```
 
 ## Generalized Additive Model Mixed Effects (GAMM)
 
-### Run Model
-
-Your proportions include exact zeros or ones, you'll need to adjust the data slightly because the beta distribution cannot handle those extremes. You can "nudge" the values slightly, e.g., using:
+### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
 
 ```{r}
-final_data$MBEPR <- pmax(0.0001, pmin(0.9999, final_data$MBEPR))
+data <-
+  data |>
+  dplyr::mutate(
+    mbepr = pmax(0.0001, pmin(0.9999, mbepr))
+  )
+```
 
-MBEPR_model_gamm <- gam(MBEPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"), 
-data = final_data,
-  family = betar(link = "logit")
+```{r}
+mbepr_model_gamm <- mgcv::gam(
+  mbepr ~ s(spei_12m) + gdp_per_capita + s(year, bs = "re"), 
+  data = data,
+  family = mgcv::betar(link = "logit")
 )
 
-summary(MBEPR_model_gamm)
+mbepr_model_gamm
 ```
 
 ```{r}
-# Visualize the smooth term for SPEI_12m
-plot(MBEPR_model_gamm, pages = 1)
-mean(coef(MBEPR_model_gamm))
-mean(coef(MBEPR_model_gamm)[grep("s\\(SPEI_12m\\)", names(coef(MBEPR_model_gamm)))])
+#| code-fold: false
+
+summary(mbepr_model_gamm)
 ```
 
 ```{r}
-# Generate a data frame for predictions
-# Create a sequence of SPEI_12m values for the plot
-new_data <- dplyr::tibble(
-  SPEI_12m = seq(min(final_data$SPEI_12m, na.rm = TRUE), 
-                 max(final_data$SPEI_12m, na.rm = TRUE), 
-                 length.out = 200),
-  PIB_per_capita = mean(final_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-  year = mean(final_data$year, na.rm = TRUE) # Keep year constant
+mbepr_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_model_gamm |> coef_mean()
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_model_gamm |> coef_spei12m_mean()
+```
+
+```{r}
+data |>
+plot_gamm(
+  model = mbepr_model_gamm,
+  title = paste0(
+    "Very Short Stature for Age versus (MBEPR) versus \n", 
+    "Standardised Precipitation Evapotranspiration Index"
+  ),
+  y_label = "Predicted MBEPR"
+)
+```
+
+### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
+
+```{r}
+data <-
+  data |>
+  dplyr::mutate(
+    beipr = pmax(0.0001, pmin(0.9999, beipr))
+  )
+```
+
+```{r}
+beipr_model_gamm <- mgcv::gam(
+  beipr ~ s(spei_12m) + gdp_per_capita + s(year, bs = "re"),
+  data = data,
+  family = mgcv::betar(link = "logit")
 )
 
-# Add predicted values and confidence intervals
-new_data$pred <- predict(MBEPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$fit
-new_data$se <- predict(MBEPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-
-# Transform to the response scale if needed (depends on the link function used in the model)
-new_data$pred_response <- plogis(new_data$pred) # For beta regression (logit link)
-new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-
-# Plot the smooth term
-new_data |>
-  ggplot2::ggplot(ggplot2::aes(x = SPEI_12m, y = pred_response)) +
-  ggplot2::geom_line(color = "blue", size = 1) +
-  ggplot2::geom_ribbon(
-    ggplot2::aes(ymin = lower, ymax = upper), 
-    alpha = 0.2, 
-    fill = "blue"
-  ) +
-  ggplot2::labs(
-    title = paste0(
-      "Estatura Muito baixa para idade e ", 
-      "Índice de Precipitação - Evapotranspiração (Índice de Seca)"
-    ),
-    x = "SPEI_12m",
-    y = "Predicted MBEPR"
-  ) + 
-  ggplot2::scale_x_reverse()
-``` 
-
-### BEIPR - Baixa Estatura para Idade
+beipr_model_gamm
+```
 
 ```{r}
-final_data$BEIPR  <- pmax(0.0001, pmin(0.9999, final_data$BEIPR ))
+#| code-fold: false
 
-BEIPR_model_gamm <- gam(BEIPR  ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"), 
-data = final_data,
-  family = betar(link = "logit")
+summary(beipr_model_gamm)
+```
+
+```{r}
+beipr_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+#| code-fold: false
+
+beipr_model_gamm |> coef_mean()
+```
+
+```{r}
+#| code-fold: false
+
+beipr_model_gamm |> coef_spei12m_mean()
+```
+
+```{r}
+data |>
+plot_gamm(
+  model = beipr_model_gamm,
+  title = paste0(
+    "Short Stature for Age (BEIPR) versues \n",
+    "Standardised Precipitation Evapotranspiration Index"
+  ),
+  x_label = "SPEI 12m",
+  y_label = "Predicted BEIPR"
+)
+```
+
+### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
+
+```{r}
+data <-
+  data |>
+  dplyr::mutate(
+    maper = pmax(0.0001, pmin(0.9999, maper))
+  )
+```
+
+```{r}
+maper_model_gamm <- mgcv::gam(
+  maper ~ s(spei_12m) + gdp_per_capita + s(year, bs = "re"),
+  data = data,
+  family = mgcv::betar(link = "logit")
 )
 
-summary(BEIPR_model_gamm)
+maper_model_gamm
 ```
 
 ```{r}
-# Visualize the smooth term for SPEI_12m
-plot(BEIPR_model_gamm, pages = 1)
-mean(coef(BEIPR_model_gamm))
-mean(coef(BEIPR_model_gamm)[grep("s\\(SPEI_12m\\)", names(coef(BEIPR_model_gamm)))])
+#| code-fold: false
+
+summary(maper_model_gamm)
 ```
 
 ```{r}
-# Generate a data frame for predictions
-# Create a sequence of SPEI_12m values for the plot
-new_data <- data.frame(
-  SPEI_12m = seq(min(final_data$SPEI_12m, na.rm = TRUE), 
-                 max(final_data$SPEI_12m, na.rm = TRUE), 
-                 length.out = 200),
-  PIB_per_capita = mean(final_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-  year = mean(final_data$year, na.rm = TRUE) # Keep year constant
+maper_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+#| code-fold: false
+
+maper_model_gamm |> coef_mean()
+```
+
+```{r}
+#| code-fold: false
+
+maper_model_gamm |> coef_spei12m_mean()
+```
+
+```{r}
+data |>
+plot_gamm(
+  model = maper_model_gamm,
+  title = paste0(
+    "Severe Thinness for Height (MAPER) versus \n",
+    "Standardised Precipitation Evapotranspiration Index"
+  ),
+  y_label = "Predicted MAPER"
+)
+```
+
+### MPEPR – Thinness for Height (Magreza Por Estatura)
+
+```{r}
+data <-
+  data |>
+  dplyr::mutate(
+    mpepr = pmax(0.0001, pmin(0.9999, mpepr))
+  )
+```
+
+```{r}
+mpepr_model_gamm <- mgcv::gam(
+  mpepr ~ s(spei_12m) + gdp_per_capita + s(year, bs = "re"),
+  data = data,
+  family = mgcv::betar(link = "logit")
 )
 
-# Add predicted values and confidence intervals
-new_data$pred <- predict(BEIPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$fit
-new_data$se <- predict(BEIPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-
-# Transform to the response scale if needed (depends on the link function used in the model)
-new_data$pred_response <- plogis(new_data$pred) # For beta regression (logit link)
-new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-
-# Plot the smooth term
-ggplot(new_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  labs(
-    title = "Baixa Estatura para Idade e Índice de Precipitação - Evapotranspiração (Índice de Seca) ",
-    x = "SPEI_12m",
-    y = "Predicted BEIPR"
-  ) + scale_x_reverse() +  # Invert the X-axis
-  theme_minimal()
-
+mpepr_model_gamm
 ```
 
-### MAPER - Magreza Acentuada por Estatura
+```{r}
+#| code-fold: false
+
+summary(mpepr_model_gamm)
+```
 
 ```{r}
-library(mgcv)
-final_data$MAPER  <- pmax(0.0001, pmin(0.9999, final_data$MAPER ))
+mpepr_model_gamm |> plot(pages = 1)
+```
 
-MAPER_model_gamm <- gam(MAPER  ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"), 
-data = final_data,
-  family = betar(link = "logit")
+```{r}
+#| code-fold: false
+
+mpepr_model_gamm |> coef_mean()
+```
+
+```{r}
+#| code-fold: false
+
+mpepr_model_gamm |> coef_spei12m_mean()
+```
+
+```{r}
+data |>
+plot_gamm(
+  model = mpepr_model_gamm,
+  title = paste0(
+    "Thinness for Height (MPEPR) versus \n",
+    "Standardised Precipitation Evapotranspiration Index"
+  ),
+  y_label = "Predicted MPEPR"
 )
-
-summary(MAPER_model_gamm)
-```
-
-```{r}
-# Visualize the smooth term for SPEI_12m
-plot(MAPER_model_gamm, pages = 1)
-mean(coef(MAPER_model_gamm))
-mean(coef(MAPER_model_gamm)[grep("s\\(SPEI_12m\\)", names(coef(MAPER_model_gamm)))])
-```
-
-```{r}
-# Generate a data frame for predictions
-# Create a sequence of SPEI_12m values for the plot
-new_data <- data.frame(
-  SPEI_12m = seq(min(final_data$SPEI_12m, na.rm = TRUE), 
-                 max(final_data$SPEI_12m, na.rm = TRUE), 
-                 length.out = 200),
-  PIB_per_capita = mean(final_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-  year = mean(final_data$year, na.rm = TRUE) # Keep year constant
-)
-
-# Add predicted values and confidence intervals
-new_data$pred <- predict(MAPER_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$fit
-new_data$se <- predict(MAPER_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-
-# Transform to the response scale if needed (depends on the link function used in the model)
-new_data$pred_response <- plogis(new_data$pred) # For beta regression (logit link)
-new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-
-# Plot the smooth term
-ggplot(new_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  labs(
-    title = "Magreza acentuada e Índice de Precipitação - Evapotranspiração (Índice de Seca)",
-    x = "SPEI_12m",
-    y = "Predicted MAPER"
-  ) + scale_x_reverse() +  # Invert the X-axis
-  theme_minimal()
-```
-
-```{r}
-final_data$MPEPR  <- pmax(0.0001, pmin(0.9999, final_data$MPEPR ))
-
-MPEPR_model_gamm <- gam(MPEPR  ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"), 
-data = final_data,
-  family = betar(link = "logit")
-)
-
-summary(MPEPR_model_gamm)
-```
-
-```{r}
-# Visualize the smooth term for SPEI_12m
-plot(MPEPR_model_gamm, pages = 1)
-mean(coef(MPEPR_model_gamm))
-mean(coef(MPEPR_model_gamm)[grep("s\\(SPEI_12m\\)", names(coef(MPEPR_model_gamm)))])
-```
-
-### MPEPR - Magreza por estatura -  geral
-
-```{r}
-# Generate a data frame for predictions
-# Create a sequence of SPEI_12m values for the plot
-new_data <- data.frame(
-  SPEI_12m = seq(min(final_data$SPEI_12m, na.rm = TRUE), 
-                 max(final_data$SPEI_12m, na.rm = TRUE), 
-                 length.out = 200),
-  PIB_per_capita = mean(final_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-  year = mean(final_data$year, na.rm = TRUE) # Keep year constant
-)
-
-# Add predicted values and confidence intervals
-new_data$pred <- predict(MPEPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$fit
-new_data$se <- predict(MPEPR_model_gamm, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-
-# Transform to the response scale if needed (depends on the link function used in the model)
-new_data$pred_response <- plogis(new_data$pred) # For beta regression (logit link)
-new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-
-# Plot the smooth term
-ggplot(new_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  labs(
-    title = "Magreza por estatura e Índice de Precipitação - Evapotranspiração (Índice de Seca)",
-    x = "SPEI_12m",
-    y = "Predicted MPEPR"
-  ) + 
-  scale_x_reverse() +  # Invert the X-axis
 ```
 
 ### Model Check
 
 ```{r}
-gam.check(MBEPR_model_gamm)
-gam.check(BEIPR_model_gamm)
-gam.check(MAPER_model_gamm)
-gam.check(MPEPR_model_gamm)
-```
-
-### Analysis by MISFS
-
-```{r}
-# List of categories in MISFS
-categories <- c("A", "B", "C", "D")
-
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MBEPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
+mgcv::gam.check(mbepr_model_gamm)
 ```
 
 ```{r}
-# List of categories in MISFS
-categories <- c("A", "B", "C", "D")
-
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    BEIPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models))
-mean(coef(gamm_models)[grep("s\\(SPEI_12m\\)", names(coef(gamm_models)))])
+mgcv::gam.check(beipr_model_gamm)
 ```
 
 ```{r}
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MAPER ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
+mgcv::gam.check(maper_model_gamm)
 ```
 
 ```{r}
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MPEPR  ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
+mgcv::gam.check(mpepr_model_gamm)
 ```
 
+## Analysis by MISFS
+
+### By S(SPEI 12m) + GDP Per Capita + S(Year)
+
+#### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
+
 ```{r}
-# List of MISFS categories
-categories <- c("A", "B", "C", "D")
-
-# Initialize an empty data frame to store predictions
-prediction_data <- data.frame()
-
-# Loop through each category to fit models and generate predictions
-for (category in categories) {
-  # Subset data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MBEPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Create a sequence of SPEI_12m values for predictions
-  new_data <- data.frame(
-    SPEI_12m = seq(
-      min(subset_data$SPEI_12m, na.rm = TRUE), 
-      max(subset_data$SPEI_12m, na.rm = TRUE), 
-      length.out = 200
-    ),
-    PIB_per_capita = mean(subset_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-    year = mean(subset_data$year, na.rm = TRUE) # Keep year constant
-  )
-  
-  # Add predictions and confidence intervals
-  new_data$pred <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$fit
-  new_data$se <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-  new_data$pred_response <- plogis(new_data$pred) # Transform predictions to response scale
-  new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-  new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-  
-  # Add a column for the category
-  new_data$MISFS <- category
-  
-  # Combine predictions into the master data frame
-  prediction_data <- rbind(prediction_data, new_data)
-}
-
-# Plot the smooth term with facets for each MISFS category
-ggplot(prediction_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  facet_wrap(~MISFS, scales = "free_x") +
-  scale_x_reverse() +
-  labs(
-    title = "Estatura Muito Baixa para idade e Indice Precipitação - Evapotranspiração por MISFs",
-    x = "SPEI_12m",
-    y = "Predicted MBEPR"
+mbepr_model_gamm_misfs_1 <- 
+  data |> 
+  model_gamm_misfs(
+    model = mbepr_model_gamm,
+    type = 1
   )
 ```
 
 ```{r}
-# List of MISFS categories
-categories <- c("A", "B", "C", "D")
+#| code-fold: false
 
-# Initialize an empty data frame to store predictions
-prediction_data <- data.frame()
+mbepr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+```
 
-# Loop through each category to fit models and generate predictions
-for (category in categories) {
-  # Subset data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    BEIPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
+```{r}
+#| code-fold: false
+
+mbepr_model_gamm_misfs_1 |> coef_means_misfs()
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_model_gamm_misfs_1 |> coef_spei12m_means_misfs()
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = mbepr_model_gamm_misfs_1,
+    title = "Very Short Stature for Age (MBEPR) by MISFS",
+    y_label = "Predicted MBEPR",
+    type = 1
   )
-  
-  # Create a sequence of SPEI_12m values for predictions
-  new_data <- data.frame(
-    SPEI_12m = seq(
-      min(subset_data$SPEI_12m, na.rm = TRUE), 
-      max(subset_data$SPEI_12m, na.rm = TRUE), 
-      length.out = 200
-    ),
-    PIB_per_capita = mean(subset_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-    year = mean(subset_data$year, na.rm = TRUE) # Keep year constant
-  )
-  
-  # Add predictions and confidence intervals
-  new_data$pred <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$fit
-  new_data$se <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-  new_data$pred_response <- plogis(new_data$pred) # Transform predictions to response scale
-  new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-  new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-  
-  # Add a column for the category
-  new_data$MISFS <- category
-  
-  # Combine predictions into the master data frame
-  prediction_data <- rbind(prediction_data, new_data)
-}
+```
 
-# Plot the smooth term with facets for each MISFS category
-ggplot(prediction_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  facet_wrap(~MISFS, scales = "free_x") +
-  scale_x_reverse() +
-  labs(
-    title = "Estatura Baixa para idade e Indice Precipitação - Evapotranspiração por MISFs",
-    x = "SPEI_12m",
-    y = "Predicted BEIPR"
+#### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
+
+```{r}
+beipr_model_gamm_misfs_1 <- 
+  data |> 
+  model_gamm_misfs(
+    model = beipr_model_gamm,
+    type = 1
   )
 ```
 
 ```{r}
-# List of MISFS categories
-categories <- c("A", "B", "C", "D")
+#| code-fold: false
 
-# Initialize an empty data frame to store predictions
-prediction_data <- data.frame()
+beipr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+```
 
-# Loop through each category to fit models and generate predictions
-for (category in categories) {
-  # Subset data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MAPER ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
+```{r}
+#| code-fold: false
+
+beipr_model_gamm_misfs_1 |> coef_means_misfs()
+```
+
+```{r}
+#| code-fold: false
+
+beipr_model_gamm_misfs_1 |> coef_spei12m_means_misfs()
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = beipr_model_gamm_misfs_1,
+    title = "Short Stature for Age (BEIPR) by MISFS",
+    y_label = "Predicted BEIPR",
+    type = 1
   )
-  
-  # Create a sequence of SPEI_12m values for predictions
-  new_data <- data.frame(
-    SPEI_12m = seq(
-      min(subset_data$SPEI_12m, na.rm = TRUE), 
-      max(subset_data$SPEI_12m, na.rm = TRUE), 
-      length.out = 200
-    ),
-    PIB_per_capita = mean(subset_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-    year = mean(subset_data$year, na.rm = TRUE) # Keep year constant
-  )
-  
-  # Add predictions and confidence intervals
-  new_data$pred <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$fit
-  new_data$se <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-  new_data$pred_response <- plogis(new_data$pred) # Transform predictions to response scale
-  new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-  new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-  
-  # Add a column for the category
-  new_data$MISFS <- category
-  
-  # Combine predictions into the master data frame
-  prediction_data <- rbind(prediction_data, new_data)
-}
+```
 
-# Plot the smooth term with facets for each MISFS category
-ggplot(prediction_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  facet_wrap(~MISFS, scales = "free_x") +
-  scale_x_reverse() +
-  labs(
-    title = "Magreza Acentuada por Estatura e Indice Precipitação - Evapotranspiração por MISFs",
-    x = "SPEI_12m",
-    y = "Predicted MAPER"
+#### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
+
+```{r}
+maper_model_gamm_misfs_1 <- 
+  data |> 
+  model_gamm_misfs(
+    model = maper_model_gamm,
+    type = 1
   )
 ```
 
 ```{r}
-# List of MISFS categories
-categories <- c("A", "B", "C", "D")
+#| code-fold: false
 
-# Initialize an empty data frame to store predictions
-prediction_data <- data.frame()
-
-# Loop through each category to fit models and generate predictions
-for (category in categories) {
-  # Subset data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MPEPR ~ s(SPEI_12m) + PIB_per_capita + s(year, bs = "re"),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Create a sequence of SPEI_12m values for predictions
-  new_data <- data.frame(
-    SPEI_12m = seq(
-      min(subset_data$SPEI_12m, na.rm = TRUE), 
-      max(subset_data$SPEI_12m, na.rm = TRUE), 
-      length.out = 200
-    ),
-    PIB_per_capita = mean(subset_data$PIB_per_capita, na.rm = TRUE), # Keep PIB constant
-    year = mean(subset_data$year, na.rm = TRUE) # Keep year constant
-  )
-  
-  # Add predictions and confidence intervals
-  new_data$pred <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$fit
-  new_data$se <- predict(model, newdata = new_data, type = "link", se.fit = TRUE)$se.fit
-  new_data$pred_response <- plogis(new_data$pred) # Transform predictions to response scale
-  new_data$upper <- plogis(new_data$pred + 1.96 * new_data$se)
-  new_data$lower <- plogis(new_data$pred - 1.96 * new_data$se)
-  
-  # Add a column for the category
-  new_data$MISFS <- category
-  
-  # Combine predictions into the master data frame
-  prediction_data <- rbind(prediction_data, new_data)
-}
-
-# Plot the smooth term with facets for each MISFS category
-ggplot(prediction_data, aes(x = SPEI_12m, y = pred_response)) +
-  geom_line(color = "blue", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "blue") +
-  facet_wrap(~MISFS, scales = "free_x") +
-  scale_x_reverse() +
-  labs(
-    title = "Magreza por Estatura e Indice Precipitação - Evapotranspiração por MISFs",
-    x = "SPEI_12m",
-    y = "Predicted MPEPR "
-  )
-```
-
-### How Variables Vary Around Time?
-
-```{r}
-## List of categories in MISFS
-categories <- c("A", "B", "C", "D")
-
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MPEPR ~  s(year),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
-
+maper_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
 ```
 
 ```{r}
-library(ggplot2)
+#| code-fold: false
 
-# Create the ggplot
-ggplot(final_data, aes(x = year, y = MBEPR)) +
- geom_point(alpha = 0.1, color = "blue") +  # Add scatter points
-  geom_smooth(method = "loess", se = FALSE, color = "red") +  # Add a smooth trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Trend of MBEPR Across Years for Different Socioeconomic Clusters",
-    x = "Year",
-    y = "Proporção de crianças com Estatura Muito baixa para idade (MBPER)",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
-  )
+maper_model_gamm_misfs_1 |> coef_means_misfs()
+```
 
- #Create the ggplot
-ggplot(final_data, aes(x = year, y = MBEPR)) +
- # geom_point(alpha = 0.5, color = "blue") +  # Add scatter points
-  geom_smooth(method = "loess", se = FALSE, color = "red") +  # Add a smooth trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Trend of MBEPR Across Years for Different Socioeconomic Clusters",
-    x = "Year",
-    y = "Proporção de crianças com Estatura Muito baixa para idade (MBPER)",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
-  )
+```{r}
+#| code-fold: false
 
-# Create the ggplot
-ggplot(final_data, aes(x = year, y = MBEPR)) +
-  #geom_point(alpha = 0.5, color = "blue") +  # Add scatter points
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), color = "red") +  # Add GAM trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Tendencia de Estatura Muito Baixa para idade através dos Anos por MISFS",
-    x = "year",
-    y = "MBEPR",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
+maper_model_gamm_misfs_1 |> coef_spei12m_means_misfs()
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = maper_model_gamm_misfs_1,
+    title = "Severe Thinness for Height (MAPER) by MISFS",
+    y_label = "Predicted MAPER",
+    type = 1
   )
 ```
 
-### Tendencia temporal Baixa estatura para idade (BEIPR)
+#### MPEPR – Thinness for Height (Magreza Por Estatura)
 
 ```{r}
-## List of categories in MISFS
-categories <- c("A", "B", "C", "D")
-
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    BEIPR ~  s(year),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
-```
-```{r}
-## List of categories in MISFS
-categories <- c("A", "B", "C", "D")
-
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MAPER ~  s(year),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
-```
-```{r}
-
-# Create the ggplot
-ggplot(final_data, aes(x = year, y = BEIPR )) +
-  #geom_point(alpha = 0.5, color = "blue") +  # Add scatter points
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), color = "red") +  # Add GAM trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Tendencia de Baixa Estatura por Idade através dos anos por MISFS",
-    x = "Year",
-    y = "BEIPR ",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
+mpepr_model_gamm_misfs_1 <- 
+  data |> 
+  model_gamm_misfs(
+    model = mpepr_model_gamm,
+    type = 1
   )
 ```
 
 ```{r}
-## List of categories in MISFS
-categories <- c("A", "B", "C", "D")
+#| code-fold: false
 
-# Initialize a list to store models
-gamm_models <- list()
-
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MAPER ~  s(year),
-    data = subset_data,
-    family = betar(link = "logit")
-  )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
+mpepr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
 ```
 
 ```{r}
-# Create the ggplot
-ggplot(final_data, aes(x = year, y = MAPER )) +
-  #geom_point(alpha = 0.5, color = "blue") +  # Add scatter points
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), color = "red") +  # Add GAM trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Tendencia de Magreza Acentuada por Estatura através dos Anos por MISFS",
-    x = "Year",
-    y = "MAPER ",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
+#| code-fold: false
+
+mpepr_model_gamm_misfs_1 |> coef_means_misfs()
+```
+
+```{r}
+#| code-fold: false
+
+mpepr_model_gamm_misfs_1 |> coef_spei12m_means_misfs()
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = mpepr_model_gamm_misfs_1,
+    title = "Thinness for Height (MPEPR) by MISFS",
+    y_label = "Predicted MPEPR",
+    type = 1
+  )
+```
+
+### Only by S(Year)
+
+#### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
+
+```{r}
+mbepr_model_gamm_misfs_2 <- 
+  data |> 
+  model_gamm_misfs(
+    model = mbepr_model_gamm,
+    type = 2
   )
 ```
 
 ```{r}
-## List of categories in MISFS
-categories <- c("A", "B", "C", "D")
+#| code-fold: false
 
-# Initialize a list to store models
-gamm_models <- list()
+mbepr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+```
 
-# Loop through each category
-for (category in categories) {
-  # Subset the data for the current category
-  subset_data <- subset(final_data, MISF == category)
-  
-  # Fit the GAM model for the subset
-  model <- gam(
-    MPEPR ~  s(year),
-    data = subset_data,
-    family = betar(link = "logit")
+```{r}
+#| code-fold: false
+
+mbepr_model_gamm_misfs_2 |> coef_means_misfs()
+```
+
+```{r}
+summarise_model_gamm_misfs_2(mbepr_model_gamm_misfs_2)
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = mbepr_model_gamm_misfs_2,
+    title = "Very Short Stature for Age (MBEPR) by MISFS",
+    x_label = "Years",
+    y_label = "Predicted MBEPR",
+    type = 2
   )
-  
-  # Store the model in the list
-  gamm_models[[category]] <- model
-  
-  # Print a summary for the model
-  cat("\nSummary for category", category, ":\n")
-  print(summary(model))
-}
-mean(coef(gamm_models[["A"]]))
-mean(coef(gamm_models[["B"]]))
-mean(coef(gamm_models[["C"]]))
-mean(coef(gamm_models[["D"]]))
+```
+
+#### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
+
+```{r}
+beipr_model_gamm_misfs_2 <- 
+  data |> 
+  model_gamm_misfs(
+    model = beipr_model_gamm,
+    type = 2
+  )
 ```
 
 ```{r}
-# Create the ggplot
-ggplot(final_data, aes(x = year, y = MPEPR  )) +
-  #geom_point(alpha = 0.5, color = "blue") +  # Add scatter points
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), color = "red") +  # Add GAM trend line
-  facet_wrap(~ MISF, ncol = 2) +  # Create facets for each MISF category
-  labs(
-    title = "Tendencia Magreza por Estatura através dos Anos por MISFS",
-    x = "year",
-    y = "MPEPR",
-    caption = "Data Source: SISVAN"
-  ) +
-  theme_minimal() +  # Apply a clean theme
-  theme(
-    strip.text = element_text(size = 12, face = "bold"),  # Style facet labels
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for clarity
-)
-```
+#| code-fold: false
 
-## Test Whether Temporal Tendencies are Signifnicant
-
-### Mbper first
-
-```{r}
-# Create a list to store models
-gam_models <- list()
-
-# Loop through each MISF category and fit a GAM model
-for (misf_level in unique(final_data$MISF)) {
-  # Subset data for the current MISF level
-  subset_data <- subset(final_data, MISF == misf_level)
-  
-  # Fit the GAM model
-  gam_model <- gam(MBEPR ~ s(year), data = subset_data)
-  
-  # Store the model in the list
-  gam_models[[misf_level]] <- gam_model
-}
-
-# Display summaries for each model
-for (misf_level in names(gam_models)) {
-  cat("\n### GAM Summary for MISF =", misf_level, "###\n")
-  print(summary(gam_models[[misf_level]]))
-}
+beipr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
 ```
 
 ```{r}
-results <- data.frame(
-  MISF = character(),
-  EDF = numeric(),
-  p_value = numeric(),
-  stringsAsFactors = FALSE
-)
+#| code-fold: false
 
-for (misf_level in names(gam_models)) {
-  model_summary <- summary(gam_models[[misf_level]])
-  results <- rbind(results, data.frame(
-    MISF = misf_level,
-    EDF = model_summary$s.table[1, "edf"],
-    p_value = model_summary$s.table[1, "p-value"]
-  ))
-}
-
-print(results)
+beipr_model_gamm_misfs_2 |> coef_means_misfs()
 ```
 
 ```{r}
- #Create a list to store models
-gam_models <- list()
-
-# Loop through each MISF category and fit a GAM model
-for (misf_level in unique(final_data$MISF)) {
-  # Subset data for the current MISF level
-  subset_data <- subset(final_data, MISF == misf_level)
-  
-  # Fit the GAM model
-  gam_model <- gam(BEIPR ~ s(year), data = subset_data)
-  
-  # Store the model in the list
-  gam_models[[misf_level]] <- gam_model
-}
-
-# Display summaries for each model
-for (misf_level in names(gam_models)) {
-  cat("\n### GAM Summary for MISF =", misf_level, "###\n")
-  print(summary(gam_models[[misf_level]]))
-}
-results <- data.frame(
-  MISF = character(),
-  EDF = numeric(),
-  p_value = numeric(),
-  stringsAsFactors = FALSE
-)
-
-for (misf_level in names(gam_models)) {
-  model_summary <- summary(gam_models[[misf_level]])
-  results <- rbind(results, data.frame(
-    MISF = misf_level,
-    EDF = model_summary$s.table[1, "edf"],
-    p_value = model_summary$s.table[1, "p-value"]
-  ))
-}
-
-print(results)
+summarise_model_gamm_misfs_2(beipr_model_gamm_misfs_2)
 ```
 
 ```{r}
- #Create a list to store models
-gam_models <- list()
+data |>
+  plot_gamm_misfs(
+    gamm_models = beipr_model_gamm_misfs_2,
+    title = "Short Stature for Age (BEIPR) by MISFS",
+    y_label = "Predicted BEIPR",
+    type = 2
+  )
+```
 
-# Loop through each MISF category and fit a GAM model
-for (misf_level in unique(final_data$MISF)) {
-  # Subset data for the current MISF level
-  subset_data <- subset(final_data, MISF == misf_level)
-  
-  # Fit the GAM model
-  gam_model <- gam(MAPER ~ s(year), data = subset_data)
-  
-  # Store the model in the list
-  gam_models[[misf_level]] <- gam_model
-}
+#### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
 
-# Display summaries for each model
-for (misf_level in names(gam_models)) {
-  cat("\n### GAM Summary for MISF =", misf_level, "###\n")
-  print(summary(gam_models[[misf_level]]))
-}
-
-results <- data.frame(
-  MISF = character(),
-  EDF = numeric(),
-  p_value = numeric(),
-  stringsAsFactors = FALSE
-)
-
-for (misf_level in names(gam_models)) {
-  model_summary <- summary(gam_models[[misf_level]])
-  results <- rbind(results, data.frame(
-    MISF = misf_level,
-    EDF = model_summary$s.table[1, "edf"],
-    p_value = model_summary$s.table[1, "p-value"]
-  ))
-}
-
-print(results)
+```{r}
+maper_model_gamm_misfs_2 <- 
+  data |> 
+  model_gamm_misfs(
+    model = maper_model_gamm,
+    type = 2
+  )
 ```
 
 ```{r}
- #Create a list to store models
-gam_models <- list()
+#| code-fold: false
 
-# Loop through each MISF category and fit a GAM model
-for (misf_level in unique(final_data$MISF)) {
-  # Subset data for the current MISF level
-  subset_data <- subset(final_data, MISF == misf_level)
-  
-  # Fit the GAM model
-  gam_model <- gam(MPEPR ~ s(year), data = subset_data)
-  
-  # Store the model in the list
-  gam_models[[misf_level]] <- gam_model
-}
-
-# Display summaries for each model
-for (misf_level in names(gam_models)) {
-  cat("\n### GAM Summary for MISF =", misf_level, "###\n")
-  print(summary(gam_models[[misf_level]]))
-}
-
-results <- data.frame(
-  MISF = character(),
-  EDF = numeric(),
-  p_value = numeric(),
-  stringsAsFactors = FALSE
-)
-
-for (misf_level in names(gam_models)) {
-  model_summary <- summary(gam_models[[misf_level]])
-  results <- rbind(results, data.frame(
-    MISF = misf_level,
-    EDF = model_summary$s.table[1, "edf"],
-    p_value = model_summary$s.table[1, "p-value"]
-  ))
-}
-
-print(results)
+maper_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
 ```
+
+```{r}
+#| code-fold: false
+
+maper_model_gamm_misfs_2 |> coef_means_misfs()
+```
+
+```{r}
+summarise_model_gamm_misfs_2(maper_model_gamm_misfs_2)
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = maper_model_gamm_misfs_2,
+    title = "Severe Thinness for Height (MAPER) by MISFS",
+    y_label = "Predicted MAPER",
+    type = 2
+  )
+```
+
+#### MPEPR – Thinness for Height (Magreza Por Estatura)
+
+```{r}
+mpepr_model_gamm_misfs_2 <- 
+  data |> 
+  model_gamm_misfs(
+    model = mpepr_model_gamm,
+    type = 2
+  )
+```
+
+```{r}
+#| code-fold: false
+
+mpepr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+```
+
+```{r}
+#| code-fold: false
+
+mpepr_model_gamm_misfs_2 |> coef_means_misfs()
+```
+
+```{r}
+summarise_model_gamm_misfs_2(mpepr_model_gamm_misfs_2)
+```
+
+```{r}
+data |>
+  plot_gamm_misfs(
+    gamm_models = mpepr_model_gamm_misfs_2,
+    title = "Thinness for Height (MPEPR) by MISFS",
+    y_label = "Predicted MPEPR",
+    type = 2
+  )
+```
+
+## Acknowledgments
+
+![](images/sustentarea-icon-rgb-150-dpi.png){style="width: 17.5%;"}
+
+This analysis is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project: *Global syndemic: the impact of anthropogenic climate change on the health and nutrition of children under five years old attended by Brazil's public health system (SUS)*.
+
+![](images/cnpq-logo.png){style="width: 30%;"}
+
+This research was supported by the Conselho Nacional de Desenvolvimento Científico e Tecnológico - Brazil ([CNPq](https://www.gov.br/cnpq/)).
+
+## References {.unnumbered}
+
+::: {#refs}
+:::

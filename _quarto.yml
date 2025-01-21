@@ -1,8 +1,9 @@
 editor: source
 
 execute:
-  cache: false
-  freeze: false
+  cache: false # "Danger Will Robinson!"
+  freeze: true # If you're going to use it, don't forget to disable it afterward!
+                # Goddammit! What did I tell you?
 
 project:
   type: website
@@ -10,12 +11,16 @@ project:
   render: [index.qmd]
   post-render: "R/_post-render.R"
 
-title: "SISVAN Data Analysis"
+title: >
+  Associations Between Undertrition in Children With the Standardised
+  Precipitation Evapotranspiration Index (SPI) of municipalities in Brazil
+  (2008-2019)
 author: "Arthur R. Magalhães & Daniel Vartanian"
 keyword: >
   data science, data analysis, rstats, nutrition, malnutrition, obesity,
   stunting, wasting, underweight, overweight, food systems, sustainable eating,
-  global syndemic, climate change, sisvan, worldclim, brazil
+  standardised precipitation evapotranspiration index, spei,
+  global syndemic, climate change, sisvan, ibge, worldclim, brazil
 date: today
 date-format: "YYYY-MM-DD"
 
@@ -30,7 +35,7 @@ website:
   search: false
   navbar:
     title: false
-    background: dark
+    background: "#272B33"
     right:
       - icon: github
         href: https://github.com/sustentarea/gs-data-analysis-report-3
@@ -55,7 +60,7 @@ format:
     language: en-us
     code-fold: true
     code-link: true
-    code-tools: true
+    code-tools: false
     df-print: paged
     fig-align: center
     cap-location: top

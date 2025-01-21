@@ -85,9 +85,23 @@
       ],
       "Hash": "df49e3306f232ec28f1604e36a202847"
     },
+    "Rdpack": {
+      "Package": "Rdpack",
+      "Version": "2.6.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "methods",
+        "rbibutils",
+        "tools",
+        "utils"
+      ],
+      "Hash": "a9e2118c664c2cd694f03de074e8d4b3"
+    },
     "TMB": {
       "Package": "TMB",
-      "Version": "1.9.10",
+      "Version": "1.9.16",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -99,7 +113,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "8477836e45ab6800fd0730bec22b0176"
+      "Hash": "ab41aa976351076a1840842a4e415d7f"
     },
     "askpass": {
       "Package": "askpass",
@@ -252,6 +266,18 @@
         "utils"
       ],
       "Hash": "d7e13f49c19103ece9e58ad2d83a7354"
+    },
+    "cellranger": {
+      "Package": "cellranger",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "rematch",
+        "tibble"
+      ],
+      "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
     },
     "checkmate": {
       "Package": "checkmate",
@@ -549,7 +575,7 @@
     },
     "glmmTMB": {
       "Package": "glmmTMB",
-      "Version": "1.1.8",
+      "Version": "1.1.10",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -561,9 +587,10 @@
         "methods",
         "mgcv",
         "nlme",
-        "numDeriv"
+        "numDeriv",
+        "reformulas"
       ],
-      "Hash": "18a871ea3448a57c8d54231ed1899567"
+      "Hash": "09c1a82cf7f80e2289aaf8267345dfd1"
     },
     "glue": {
       "Package": "glue",
@@ -703,6 +730,28 @@
         "utils"
       ],
       "Hash": "0080607b4a1a7b28979aecef976d8bc2"
+    },
+    "janitor": {
+      "Package": "janitor",
+      "Version": "2.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "dplyr",
+        "hms",
+        "lifecycle",
+        "lubridate",
+        "magrittr",
+        "purrr",
+        "rlang",
+        "snakecase",
+        "stringi",
+        "stringr",
+        "tidyr",
+        "tidyselect"
+      ],
+      "Hash": "64f308bf1fbf5f856cdf4b4c7c0ce51b"
     },
     "jquerylib": {
       "Package": "jquerylib",
@@ -942,6 +991,25 @@
       ],
       "Hash": "5bfe2927efa9f87766ca9605301ea48f"
     },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "cli",
+        "farver",
+        "ggplot2",
+        "grDevices",
+        "graphics",
+        "grid",
+        "gtable",
+        "rlang",
+        "stats",
+        "utils"
+      ],
+      "Hash": "e23fb9ecb1258207bcb763d78d513439"
+    },
     "pillar": {
       "Package": "pillar",
       "Version": "1.9.0",
@@ -1164,11 +1232,11 @@
       "Version": "0.0.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteUsername": "paleolimbot",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "wmoldham",
       "RemoteRepo": "rbbt",
       "RemoteRef": "master",
-      "RemoteSha": "212680cf89b22784bbbb9754d021c3196e85398f",
-      "RemoteHost": "api.github.com",
+      "RemoteSha": "8d64efcf46468c9388580d037530b58434592196",
       "Requirements": [
         "R",
         "clipr",
@@ -1180,7 +1248,19 @@
         "rstudioapi",
         "stringr"
       ],
-      "Hash": "8323921cdcefb27aa2fb35e3a770829a"
+      "Hash": "0b02f8f864a270df2c30afce624cac9a"
+    },
+    "rbibutils": {
+      "Package": "rbibutils",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "tools",
+        "utils"
+      ],
+      "Hash": "dfc034a172fd88fc66b1a703894c4185"
     },
     "readr": {
       "Package": "readr",
@@ -1204,6 +1284,41 @@
         "vroom"
       ],
       "Hash": "9de96463d2117f6ac49980577939dfb3"
+    },
+    "readxl": {
+      "Package": "readxl",
+      "Version": "1.4.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "cellranger",
+        "cpp11",
+        "progress",
+        "tibble",
+        "utils"
+      ],
+      "Hash": "8cf9c239b96df1bbb133b74aef77ad0a"
+    },
+    "reformulas": {
+      "Package": "reformulas",
+      "Version": "0.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "Rdpack",
+        "methods",
+        "stats"
+      ],
+      "Hash": "d23beb08dca526d22ff47ce399260ba4"
+    },
+    "rematch": {
+      "Package": "rematch",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "cbff1b666c6fa6d21202f07e2318d4f1"
     },
     "renv": {
       "Package": "renv",
@@ -1369,6 +1484,18 @@
         "utils"
       ],
       "Hash": "c12e756cf947e58b0f2c2a520521a5a8"
+    },
+    "snakecase": {
+      "Package": "snakecase",
+      "Version": "0.11.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "stringi",
+        "stringr"
+      ],
+      "Hash": "58767e44739b76965332e8a4fe3f91f1"
     },
     "spelling": {
       "Package": "spelling",

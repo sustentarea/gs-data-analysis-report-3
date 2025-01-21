@@ -3,10 +3,84 @@
 // See: <https://quarto.org/docs/output-formats/html-themes.htm>.
 // See: <https://quarto.org/docs/authoring/brand.html>.
 
-$toc-font-size: 1em !default;
+$toc-font-size: 0.9em !default;
+
+$content-padding-top: 0.5rem;
+
+$callout-color-note: #006909;
+$callout-color-tip: #006909;
+$callout-color-caution: #006909;
+$callout-color-warning: #006909;
+$callout-color-important: #006909;
 
 /*-- scss:rules --*/
 
+/* Body ----- */
+
+body {
+  color: $brand-grey;
+}
+
 quarto-float-caption-top {
-  margin-bottom: 1.5em;
+  margin-bottom: 1em;
+}
+
+/* Navigation ----- */
+
+.sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
+  color: $brand-black !important;
+}
+
+div.sidebar-item-container a:hover {
+  color: $brand-black !important;
+}
+
+div.sidebar-item-container .active {
+  font-weight: bold;
+}
+
+/* Headings ----- */
+
+h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 .header-section-number {
+  color: $tertiary;
+  font-weight: bold;
+}
+
+/* Code ----- */
+
+code a:any-link {
+  text-decoration: underline;
+  text-decoration-color: $primary;
+}
+
+.code-tools-button {
+  color: $primary;
+}
+
+/* Captions ----- */
+
+.panel-caption, .figure-caption, .subfigure-caption, .table-caption, figcaption, caption {
+  color: $tertiary;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.legend {
+  font-size: .9rem;
+  color: $black;
+}
+
+.quarto-float-caption-top {
+  margin-bottom: 2em;
+}
+
+/* Others ----- */
+
+.center-x {
+  display: inline-block;
+  text-align: center;
+}
+
+.brand-green {
+  color: $primary;
 }
