@@ -5,9 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-> [!IMPORTANT]
-> This analysis is currently incomplete due to missing data. Arthur is actively working to locate the missing information. The report will be updated as soon as possible.
-
 ## Overview
 
 🍚🌾🌱🌍🇧🇷📊📈🚜🌽💧☀️🌦️👩‍🌾👨‍🌾🌳📅

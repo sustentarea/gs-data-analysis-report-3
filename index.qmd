@@ -7,7 +7,7 @@ source(here::here("R", "_setup.R"))
 
 ## Overview
 
-This document explore possible associations between undertrition in children with the Standardised Precipitation Evapotranspiration Index (SPEI) of municipalities in Brazil durting 2008-2019 period. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
+This document explore possible associations between undertrition in children with the Standardised Precipitation Evapotranspiration Index (SPEI) of municipalities in Brazil during 2008-2019 period. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
 
 ::: {.callout-warning}
 Please note that this is a preliminary report intended to support decision-making and may not include all the details of the analysis.

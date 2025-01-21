@@ -12,9 +12,9 @@ project:
   post-render: "R/_post-render.R"
 
 title: >
-  Associations Between Undertrition in Children With the Standardised
-  Precipitation Evapotranspiration Index (SPI) of municipalities in Brazil
-  (2008-2019)
+  Analysis of Associations Between Undernutrition in Children and the
+  Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian
+  Municipalities (2008–2019)
 author: "Arthur R. Magalhães & Daniel Vartanian"
 keyword: >
   data science, data analysis, rstats, nutrition, malnutrition, obesity,
