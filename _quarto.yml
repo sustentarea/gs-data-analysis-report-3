@@ -2,7 +2,7 @@ editor: source
 
 execute:
   cache: false # "Danger Will Robinson!"
-  freeze: true # If you're going to use it, don't forget to disable it afterward!
+  freeze: false # If you plan to use it, remember to disable it afterward!
                 # Goddammit! What did I tell you?
 
 project:
@@ -18,7 +18,7 @@ title: >
 author: "Arthur R. Magalhães & Daniel Vartanian"
 keyword: >
   data science, data analysis, rstats, nutrition, malnutrition, obesity,
-  stunting, wasting, underweight, overweight, food systems, sustainable eating,
+  stunting, wasting, food systems, sustainable eating,
   standardised precipitation evapotranspiration index, spei,
   global syndemic, climate change, sisvan, ibge, worldclim, brazil
 date: today

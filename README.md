@@ -1,21 +1,19 @@
 # gs-data-analysis-report-3
 
 <!-- badges: start -->
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 ## Overview
 
-🍚🌾🌱🌍🇧🇷📊📈🚜🌽💧☀️🌦️👩‍🌾👨‍🌾🌳📅
+🌧️🌡️🌍👶📆🇧🇷🧮📉🌾🌱🍚🌽🚜🌳💧☀️🌦️📈
 
-This repository contains a report that explores associations between data from Brazil's Food and Nutrition Surveillance System (SISVAN) ([link to SISVAN](https://sisaps.saude.gov.br/sisvan/)) and climate variables.
-
-The report is available [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
+This repository contains a report exploring potential associations between undernutrition in children and the Standardised Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities from 2008 to 2019. Access the report [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
 
 ## How to use
 
-The analyses contained in this document are 100% reproducible. They were made using the [R programming language](https://www.r-project.org/) and the  [Quarto](https://quarto.org/) publishing system. The [`renv`](https://rstudio.github.io/renv/) package was used to ensure that the R environment used can be restored (see `renv.lock`). The computational notebook is available in the `index.qmd` file.
+The analyses contained in the report are 100% reproducible. They were made using the [R programming language](https://www.r-project.org/) and the  [Quarto](https://quarto.org/) publishing system. The [`renv`](https://rstudio.github.io/renv/) package was used to ensure that the R environment used can be restored (see `renv.lock`). The computational notebook is available in the `index.qmd` file.
 
 To reproduce the analyses do the following steps:
 
@@ -28,14 +26,14 @@ To reproduce the analyses do the following steps:
 
 To cite this work, please use the following format:
 
-Vartanian, D., & Magalhães, A. R.(2024). *Global syndemic data analysis report 3: SISVAN data analysis*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
+Magalhães, A. R & Vartanian, D. (2025). *Global syndemic data analysis: Report 3: SISVAN data analysis*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
 
 A BibTeX entry for LaTeX users is
 
 ```         
-@techreport{magalhaes2024,
-  title = {Global syndemic project: data analysis report 3 - SISVAN data analysis},
-  author = {{Daniel Vartanian} and {Arthur Ramalho Magalhães}},
+@techreport{magalhaes2025,
+  title = {Global syndemic project: data analysis: Report 3 - SISVAN data analysis},
+  author = {{Arthur Ramalho Magalhães} and {Daniel Vartanian}},
   year = {2025},
   address = {São Paulo},
   institution = {Sustentarea Research and Extension Group at the University of São Paulo},

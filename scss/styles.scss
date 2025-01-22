@@ -46,6 +46,12 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 .header-section-number {
   font-weight: bold;
 }
 
+/* Blockquote ----- */
+
+.blockquote {
+  color: $tertiary;
+}
+
 /* Code ----- */
 
 code a:any-link {
@@ -54,7 +60,7 @@ code a:any-link {
 }
 
 .code-tools-button {
-  color: $primary;
+  color: $brand-black;
 }
 
 /* Captions ----- */
@@ -71,6 +77,8 @@ code a:any-link {
 }
 
 .quarto-float-caption-top {
+  font-size: .9rem;
+  color: $black;
   margin-bottom: 2em;
 }
 

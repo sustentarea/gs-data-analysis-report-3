@@ -7,39 +7,51 @@ source(here::here("R", "_setup.R"))
 
 ## Overview
 
-This document explore possible associations between undertrition in children with the Standardised Precipitation Evapotranspiration Index (SPEI) of municipalities in Brazil during 2008-2019 period. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
+This document explores potential associations between undernutrition in children and the Standardised Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities from 2008 to 2019. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
 
 ::: {.callout-warning}
-Please note that this is a preliminary report intended to support decision-making and may not include all the details of the analysis.
+Please note that this report is designed to support decision-making and may not include all the details of the analysis.
 :::
 
 ## Methods
 
-### Approach and procedure method
+### Approach and Procedure Method
 
-The analysis will rely solely on a visual inspection of the data. If necessary, additional analysis and updates will be incorporated into this report later.
+The analysis was conducted based solely on visual inspections of the data. If needed, further analyses and updates will be integrated into this report at a later stage.
 
-### Source of data/information
+### Source of Data/Information
 
 The data used in this analysis have as sources:
 
 - The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita.
-- Brazil's Food and Nutrition Surveillance System (SISVAN) ([link to SISVAN](https://sisaps.saude.gov.br/sisvan/), for data on malnutrition.
+- Brazil's Food and Nutrition Surveillance System ([SISVAN](https://sisaps.saude.gov.br/sisvan/)), for data on malnutrition.
 - [WorldClim](https://worldclim.org/data/index.html), for data on bioclimatic variables, which allowed us to calculate the Standardised Precipitation Evapotranspiration Index (SPEI) for municipalities in Brazil.
 
-### Data wrangling
+The data files can be found in the [data](https://github.com/sustentarea/gs-data-analysis-report-3/tree/main/data) directory of the code repository.
 
-The data wrangling and analysis followed the data science framework outlined by Hadley Wickham et al. [@wickham2023e], as illustrated in [@fig-wickham-at-al-2024-figure-1].
+### Data Wrangling
+
+The data wrangling and analysis followed the data science framework outlined by @wickham2023e, as illustrated in [@fig-wickham-at-al-2024-figure-1].
 
 ::: {#fig-wickham-at-al-2024-figure-1}
 ![](images/wickham-at-al-2024-figure-1.png){width=75%}
 
 [Source: Reproduced from @wickham2023e.]{.legend}
 
-Model of the data science process created by Wickham, Çetinkaya-Runde, and Grolemund [-@wickham2023e].
+Model of the data science process created by Wickham, Çetinkaya-Runde, and Grolemund.
 :::
 
-All the analyses are 100% reproducible and can be run again at any time. See the [README](https://github.com/sustentarea/gs-data-analysis-report-2/blob/main/README.md) file on the code repository to learn how to run them.
+All the analyses are 100% reproducible and can be run again at any time. See the [README](https://github.com/sustentarea/gs-data-analysis-report-3/blob/main/README.md) file on the code repository to learn how to run them.
+
+### Interpretation of Results
+
+To ensure practical significance, the adjusted $\text{R}^2$ of the models are analysed for their effect sizes considering a confidence interval of $0.95$. We use @cohen1988a benchmark for interpretation.
+
+A $\text{R}^2$ less than $\approx 0.0196$ is considered negligeble. Please note the following excerpts from @cohen1988a:
+
+> SMALL EFFECT SIZE: $f^2 = .02$. Translated into $\text{R}^{2}$ or partial $\text{R}^{2}$ for Case 1, this gives $.02 / (1 + .02) = .0196$. We thus define a small effect as one that accounts for 2% of the $\text{Y}$ variance (in contrast with 1% for $r$), and translate to an $\text{R} = \sqrt{0196} = .14$ (compared to .10 for $r$). This is a modest enough amount, **just barely escaping triviality** and (alas!) all too frequently in practice represents the true order of magnitude of the effect being tested [@cohen1988a, p. 413].
+
+> [...] in many circumstances, all that is intended by "proving" the null hypothesis is that the ES [Effect Size] is not necessarily zero but **small enough to be negligible** [...]. [@cohen1988a, p. 461].
 
 ## Setting the Enviroment
 
@@ -49,16 +61,22 @@ All the analyses are 100% reproducible and can be run again at any time. See the
 library(beepr)
 library(cli)
 library(dplyr)
+library(effectsize)
 library(ggplot2)
 library(glmmTMB)
 library(janitor)
 library(lme4)
 library(magrittr)
 library(mgcv)
+library(MuMIn)
 library(patchwork)
+library(performance)
 library(polyglotr)
 library(prettycheck) # github.com/danielvartan/prettycheck
+library(psychometric)
+library(r2glmm)
 library(readxl)
+library(rutils) # github.com/danielvartan/rutils
 library(stats)
 library(stringr)
 library(tidyr)
@@ -72,8 +90,6 @@ library(mgcv)
 library(ggplot2)
 ```
 
-## Loading functions
-
 ```{r}
 source(here::here("R", "coef_mean.R"))
 source(here::here("R", "model_gamm_misfs.R"))
@@ -84,9 +100,11 @@ source(here::here("R", "utils-plots.R"))
 
 ## Importing and Tidying the Data
 
-### GDP Data
+### GDP Per Capita Data
 
 ```{r}
+#| output: false
+
 gdp_data <- 
   here::here("data", "PIB dos Municípios - base de dados 2010-2021.xlsx") |>
   readxl::read_excel(col_types = "text") |>
@@ -110,13 +128,13 @@ gdp_data <-
       as.integer(),
     gdp_per_capita = as.numeric(gdp_per_capita)
   )
-
-gdp_data
 ```
 
 ### Nutrition Data
 
 ```{r}
+#| output: false
+
 nutrition_data <-
   here::here("data", "Banco_dados_malnutritio_clima - Adaptado.csv") |>
   readr::read_csv(col_types = readr::cols(.default = "c")) |>
@@ -136,15 +154,19 @@ nutrition_data <-
   dplyr::mutate(
     year = as.integer(year),
     municipality_code = as.integer(municipality_code),
-    cobrs = as.numeric(cobrs)
+    cobrs = as.numeric(cobrs),
+    mbepr = pmax(0.0001, pmin(0.9999, mbepr)),
+    beipr = pmax(0.0001, pmin(0.9999, beipr)),
+    maper = pmax(0.0001, pmin(0.9999, maper)),
+    mpepr = pmax(0.0001, pmin(0.9999, mpepr))
   )
-
-nutrition_data
 ```
 
 ### SPEI Data
 
 ```{r}
+#| output: false
+
 spei_data <- 
   here::here("data", "spei_Extreme_drought_event_municipality_year2.csv") |>
   readr::read_csv(col_types = readr::cols(.default = "c")) |>
@@ -177,8 +199,6 @@ spei_data <-
       gsub("spei_12m_", "", year) |>
       as.integer(),
   )
-  
-spei_data
 ```
 
 ### Analysis Data
@@ -193,12 +213,16 @@ data <-
   dplyr::left_join(
     spei_data,
     by = c("year", "municipality_code")
+  ) |>
+  dplyr::select(
+    year, municipality_code, misf, cobrs, mbepr, beipr, maper, 
+    mpepr, gdp_per_capita, spei_12m
   )
 
 data
 ```
 
-## Checking for Muncipalities With Minimum 5% Cover from SISVAN
+Adjusting the data to allow only muncipalities with a minimum of $5\%$ cover from SISVAN.
 
 ```{r}
 #| code-fold: false
@@ -229,184 +253,24 @@ data
 ```{r}
 #| code-fold: false
 
-min(data$spei_12m)
-```
-
-```{r}
-#| code-fold: false
-
-max(data$spei_12m)
-```
-
-## Generalized Linear Mixed Model (GLMM)
-
-### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
-
-::: {.callout-caution}
-See 
-<https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html>
-to learn more about the model warnings.
-:::
-
-```{r}
-#| code-fold: false
-
-mbepr_model <- glmmTMB::glmmTMB(
-  mbepr ~ spei_12m + gdp_per_capita + (1 | year),
-  data = data,
-  family = glmmTMB::betabinomial(link = "logit"),
-  control = glmmTMB::glmmTMBControl(
-    optimizer = optim, 
-    optArgs = list(method = "BFGS")
-  )
-)
-
-mbepr_model
-```
-
-```{r}
-overdispersion_test <- 
-  mbepr_model |>
-  stats::residuals(type = "pearson") %>%
-  `^`(2) %>%
-  `/`(mbepr_model$df.residual) |>
-  sum()
-```
-
-```{r}
-#| code-fold: false
-
-cli::cli_inform("Overdispersion statistic: {overdispersion_test}\n")
-
-if (overdispersion_test > 1.5) {
-  cli::cli_inform("There might still be overdispersion in the model.\n")
-}
-```
-
-```{r}
-dplyr::tibble(
-  fitted = stats::fitted(mbepr_model),
-  residuals = stats::residuals(mbepr_model, type = "pearson")
-) |>
-  ggplot2::ggplot(ggplot2::aes(x = fitted, y = residuals)) +
-  ggplot2::geom_point(alpha = 0.5) +
-  ggplot2::geom_hline(
-    yintercept = 0, 
-    color = get_brand_color("red")
-  ) +
-  ggplot2::labs(
-    x = "Fitted values",
-    y = "Pearson residuals",
-    title = "Residuals vs. Fitted"
-  )
-```
-
-```{r}
 data |>
-  ggplot2::ggplot(ggplot2::aes(x = spei_12m, y = mbepr)) +
-  ggplot2::geom_point(alpha = 0.5) +
-  ggplot2::geom_smooth(
-    method = "glm", 
-    method.args = list(family = "binomial"), 
-    se = TRUE, 
-    color = get_brand_color("red")
-  ) +
-  ggplot2::labs(
-    x = "SPEI (12 months)",
-    y = "Probability of MBEPR",
-    title = "Relationship between SPEI_12m and MBEPR"
-  )
+  dplyr::pull(spei_12m) %>%
+  min(na.rm = TRUE)
 ```
 
 ```{r}
+#| code-fold: false
+
 data |>
-  tidyr::drop_na(gdp_per_capita, mbepr) |>
-  ggplot2::ggplot(ggplot2::aes(x = gdp_per_capita, y = mbepr)) +
-  ggplot2::geom_point(alpha = 0.5) +
-  ggplot2::geom_smooth(
-    method = "glm", 
-    method.args = list(family = "binomial"), 
-    se = TRUE, 
-    color = get_brand_color("red")
-  ) +
-  ggplot2::labs(
-    x = "GDP per capita",
-    y = "Very Short Stature for Age (MBEPR)",
-    title = "Relationship between GDP per capita and MBEPR"
-  )
-``` 
-
-### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
-
-```{r}
-#| code-fold: false
-
-beipr_model <- glmmTMB::glmmTMB(
-  beipr ~ spei_12m * gdp_per_capita + (1 | year),
-  data = data,
-  family = glmmTMB::betabinomial(link = "logit")
-)
-
-beipr_model
+  dplyr::pull(spei_12m) %>%
+  max(na.rm = TRUE)
 ```
 
-```{r}
-#| code-fold: false
+## Modeling the Data
 
-summary(beipr_model)
-```
+For this analysis we used Generalized Additive Models ([GAMs](https://en.wikipedia.org/wiki/Generalized_additive_model)).
 
-### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
-
-```{r}
-#| code-fold: false
-
-maper_model <- glm(
-  maper ~ spei_12m * gdp_per_capita,
-  data = data,
-  family = quasibinomial(link = "logit")
-)
-
-maper_model
-```
-
-```{r}
-#| code-fold: false
-
-summary(maper_model)
-```
-
-### MPEPR – Thinness for Height (Magreza Por Estatura)
-
-```{r}
-#| code-fold: false
-
-mpepr_model <- glm(
-  mpepr ~ spei_12m * gdp_per_capita,
-  data = data,
-  family = quasibinomial(link = "logit")
-)
-
-mpepr_model
-```
-
-```{r}
-#| code-fold: false
-
-summary(mpepr_model)
-```
-
-## Generalized Additive Model Mixed Effects (GAMM)
-
-### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
-
-```{r}
-data <-
-  data |>
-  dplyr::mutate(
-    mbepr = pmax(0.0001, pmin(0.9999, mbepr))
-  )
-```
+### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
 
 ```{r}
 mbepr_model_gamm <- mgcv::gam(
@@ -414,8 +278,6 @@ mbepr_model_gamm <- mgcv::gam(
   data = data,
   family = mgcv::betar(link = "logit")
 )
-
-mbepr_model_gamm
 ```
 
 ```{r}
@@ -425,7 +287,7 @@ summary(mbepr_model_gamm)
 ```
 
 ```{r}
-mbepr_model_gamm |> plot(pages = 1)
+summarise_r2(mbepr_model_gamm, n = nrow(data))
 ```
 
 ```{r}
@@ -441,6 +303,14 @@ mbepr_model_gamm |> coef_spei12m_mean()
 ```
 
 ```{r}
+mbepr_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+mgcv::gam.check(mbepr_model_gamm)
+```
+
+```{r}
 data |>
 plot_gamm(
   model = mbepr_model_gamm,
@@ -452,15 +322,7 @@ plot_gamm(
 )
 ```
 
-### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
-
-```{r}
-data <-
-  data |>
-  dplyr::mutate(
-    beipr = pmax(0.0001, pmin(0.9999, beipr))
-  )
-```
+### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
 
 ```{r}
 beipr_model_gamm <- mgcv::gam(
@@ -468,8 +330,6 @@ beipr_model_gamm <- mgcv::gam(
   data = data,
   family = mgcv::betar(link = "logit")
 )
-
-beipr_model_gamm
 ```
 
 ```{r}
@@ -479,7 +339,7 @@ summary(beipr_model_gamm)
 ```
 
 ```{r}
-beipr_model_gamm |> plot(pages = 1)
+summarise_r2(beipr_model_gamm, n = nrow(data))
 ```
 
 ```{r}
@@ -495,6 +355,14 @@ beipr_model_gamm |> coef_spei12m_mean()
 ```
 
 ```{r}
+beipr_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+mgcv::gam.check(beipr_model_gamm)
+```
+
+```{r}
 data |>
 plot_gamm(
   model = beipr_model_gamm,
@@ -507,15 +375,7 @@ plot_gamm(
 )
 ```
 
-### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
-
-```{r}
-data <-
-  data |>
-  dplyr::mutate(
-    maper = pmax(0.0001, pmin(0.9999, maper))
-  )
-```
+### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
 
 ```{r}
 maper_model_gamm <- mgcv::gam(
@@ -523,8 +383,6 @@ maper_model_gamm <- mgcv::gam(
   data = data,
   family = mgcv::betar(link = "logit")
 )
-
-maper_model_gamm
 ```
 
 ```{r}
@@ -534,7 +392,7 @@ summary(maper_model_gamm)
 ```
 
 ```{r}
-maper_model_gamm |> plot(pages = 1)
+summarise_r2(maper_model_gamm, n = nrow(data))
 ```
 
 ```{r}
@@ -550,6 +408,14 @@ maper_model_gamm |> coef_spei12m_mean()
 ```
 
 ```{r}
+maper_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+mgcv::gam.check(maper_model_gamm)
+```
+
+```{r}
 data |>
 plot_gamm(
   model = maper_model_gamm,
@@ -561,15 +427,7 @@ plot_gamm(
 )
 ```
 
-### MPEPR – Thinness for Height (Magreza Por Estatura)
-
-```{r}
-data <-
-  data |>
-  dplyr::mutate(
-    mpepr = pmax(0.0001, pmin(0.9999, mpepr))
-  )
-```
+### MPEPR – Thinness for Height (*Magreza Por Estatura*)
 
 ```{r}
 mpepr_model_gamm <- mgcv::gam(
@@ -577,8 +435,6 @@ mpepr_model_gamm <- mgcv::gam(
   data = data,
   family = mgcv::betar(link = "logit")
 )
-
-mpepr_model_gamm
 ```
 
 ```{r}
@@ -588,7 +444,7 @@ summary(mpepr_model_gamm)
 ```
 
 ```{r}
-mpepr_model_gamm |> plot(pages = 1)
+summarise_r2(mpepr_model_gamm, n = nrow(data))
 ```
 
 ```{r}
@@ -604,6 +460,14 @@ mpepr_model_gamm |> coef_spei12m_mean()
 ```
 
 ```{r}
+mpepr_model_gamm |> plot(pages = 1)
+```
+
+```{r}
+mgcv::gam.check(mpepr_model_gamm)
+```
+
+```{r}
 data |>
 plot_gamm(
   model = mpepr_model_gamm,
@@ -615,29 +479,23 @@ plot_gamm(
 )
 ```
 
-### Model Check
+## Analyzing Model Results by MISFS-R Clusters
 
-```{r}
-mgcv::gam.check(mbepr_model_gamm)
-```
+::: {.callout-note}
+See @carvalho2021a and @norde2023 to learn more about the Multidimensional Index for Sustainable Food Systems (MISFS).
+:::
 
-```{r}
-mgcv::gam.check(beipr_model_gamm)
-```
+::: {#fig-norde-2023-figure-6}
+![](images/norde-2023-figure-6.jpg){width=90%}
 
-```{r}
-mgcv::gam.check(maper_model_gamm)
-```
+[Source: Reproduced from @norde2023.]{.legend}
 
-```{r}
-mgcv::gam.check(mpepr_model_gamm)
-```
-
-## Analysis by MISFS
+Dendrogram for cluster analysis between Brazilian states considering all the Revised Multidimensional Index for Sustainable Food Systems (MISFS-R) indicators and geographical location of each cluster.
+:::
 
 ### By S(SPEI 12m) + GDP Per Capita + S(Year)
 
-#### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
+#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
 
 ```{r}
 mbepr_model_gamm_misfs_1 <- 
@@ -648,10 +506,10 @@ mbepr_model_gamm_misfs_1 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-mbepr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(mbepr_model_gamm_misfs_1)
 ```
 
 ```{r}
@@ -676,7 +534,7 @@ data |>
   )
 ```
 
-#### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
+#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
 
 ```{r}
 beipr_model_gamm_misfs_1 <- 
@@ -687,10 +545,10 @@ beipr_model_gamm_misfs_1 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-beipr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(beipr_model_gamm_misfs_1)
 ```
 
 ```{r}
@@ -715,7 +573,7 @@ data |>
   )
 ```
 
-#### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
+#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
 
 ```{r}
 maper_model_gamm_misfs_1 <- 
@@ -726,10 +584,10 @@ maper_model_gamm_misfs_1 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-maper_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(maper_model_gamm_misfs_1)
 ```
 
 ```{r}
@@ -754,7 +612,7 @@ data |>
   )
 ```
 
-#### MPEPR – Thinness for Height (Magreza Por Estatura)
+#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
 
 ```{r}
 mpepr_model_gamm_misfs_1 <- 
@@ -765,10 +623,10 @@ mpepr_model_gamm_misfs_1 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-mpepr_model_gamm_misfs_1 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(mpepr_model_gamm_misfs_1)
 ```
 
 ```{r}
@@ -795,7 +653,7 @@ data |>
 
 ### Only by S(Year)
 
-#### MBEPR – Very Short Stature for Age (Muito Baixa Estatura Para a Idade)
+#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
 
 ```{r}
 mbepr_model_gamm_misfs_2 <- 
@@ -806,20 +664,16 @@ mbepr_model_gamm_misfs_2 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-mbepr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(mbepr_model_gamm_misfs_2)
 ```
 
 ```{r}
 #| code-fold: false
 
 mbepr_model_gamm_misfs_2 |> coef_means_misfs()
-```
-
-```{r}
-summarise_model_gamm_misfs_2(mbepr_model_gamm_misfs_2)
 ```
 
 ```{r}
@@ -833,7 +687,7 @@ data |>
   )
 ```
 
-#### BEIPR – Short Stature for Age (Baixa Estatura Para Idade)
+#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
 
 ```{r}
 beipr_model_gamm_misfs_2 <- 
@@ -844,20 +698,16 @@ beipr_model_gamm_misfs_2 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-beipr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(beipr_model_gamm_misfs_2)
 ```
 
 ```{r}
 #| code-fold: false
 
 beipr_model_gamm_misfs_2 |> coef_means_misfs()
-```
-
-```{r}
-summarise_model_gamm_misfs_2(beipr_model_gamm_misfs_2)
 ```
 
 ```{r}
@@ -870,7 +720,7 @@ data |>
   )
 ```
 
-#### MAPER – Severe Thinness for Height (Magreza Acentuada Para a Estatura)
+#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
 
 ```{r}
 maper_model_gamm_misfs_2 <- 
@@ -881,20 +731,16 @@ maper_model_gamm_misfs_2 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-maper_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(maper_model_gamm_misfs_2)
 ```
 
 ```{r}
 #| code-fold: false
 
 maper_model_gamm_misfs_2 |> coef_means_misfs()
-```
-
-```{r}
-summarise_model_gamm_misfs_2(maper_model_gamm_misfs_2)
 ```
 
 ```{r}
@@ -907,7 +753,7 @@ data |>
   )
 ```
 
-#### MPEPR – Thinness for Height (Magreza Por Estatura)
+#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
 
 ```{r}
 mpepr_model_gamm_misfs_2 <- 
@@ -918,20 +764,16 @@ mpepr_model_gamm_misfs_2 <-
   )
 ```
 
-```{r}
+```{r paged.print=FALSE}
 #| code-fold: false
 
-mpepr_model_gamm_misfs_2 |> summarise_model_gamm_misfs()
+data |> summarise_model_gamm_misfs(mpepr_model_gamm_misfs_2)
 ```
 
 ```{r}
 #| code-fold: false
 
 mpepr_model_gamm_misfs_2 |> coef_means_misfs()
-```
-
-```{r}
-summarise_model_gamm_misfs_2(mpepr_model_gamm_misfs_2)
 ```
 
 ```{r}
