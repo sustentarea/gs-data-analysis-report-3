@@ -12,15 +12,15 @@ project:
   post-render: "R/_post-render.R"
 
 title: >
-  Analysis of Associations Between Undernutrition in Children and the
+  Exploring potential associations between childhood undernutrition and the
   Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian
-  Municipalities (2008–2019)
-author: "Arthur R. Magalhães & Daniel Vartanian"
+  municipalities (2008–2019)
+author: "Arthur R. Magalhães, Daniel Vartanian & Aline Martins de Carvalho"
 keyword: >
-  data science, data analysis, rstats, nutrition, malnutrition, obesity,
-  stunting, wasting, food systems, sustainable eating,
-  standardised precipitation evapotranspiration index, spei,
-  global syndemic, climate change, sisvan, ibge, worldclim, brazil
+  nutrition, malnutrition, obesity, stunting, wasting, food systems,
+  sustainable eating, standardised precipitation evapotranspiration index,
+  spei, global syndemic, climate change, data science, data analysis, rstats,
+  sisvan, ibge, worldclim, brazil
 date: today
 date-format: "YYYY-MM-DD"
 

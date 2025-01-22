@@ -9,7 +9,7 @@
 
 🌧️🌡️🌍👶📆🇧🇷🧮📉🌾🌱🍚🌽🚜🌳💧☀️🌦️📈
 
-This repository contains a report exploring potential associations between undernutrition in children and the Standardised Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities from 2008 to 2019. Access the report [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
+This repository contains a report exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index [SPEI](https://en.wikipedia.org/wiki/Standardised_Precipitation_Evapotranspiration_Index)) in Brazilian municipalities (2008–2019. Access the report [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
 
 ## How to use
 
@@ -26,14 +26,14 @@ To reproduce the analyses do the following steps:
 
 To cite this work, please use the following format:
 
-Magalhães, A. R & Vartanian, D. (2025). *Global syndemic data analysis: Report 3: SISVAN data analysis*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
+Magalhães, A. R., Vartanian, D, & Carvalho, A. M. (2025). *Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
 
 A BibTeX entry for LaTeX users is
 
 ```         
 @techreport{magalhaes2025,
-  title = {Global syndemic project: data analysis: Report 3 - SISVAN data analysis},
-  author = {{Arthur Ramalho Magalhães} and {Daniel Vartanian}},
+  title = {Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)},
+  author = {{Arthur Ramalho Magalhães} and {Daniel Vartanian} and {Aline Martins de Carvalho}},
   year = {2025},
   address = {São Paulo},
   institution = {Sustentarea Research and Extension Group at the University of São Paulo},
@@ -54,7 +54,7 @@ A BibTeX entry for LaTeX users is
       <br>
     </td>
     <td width="70%">
-      This analysis is part of the <a href="https://www.fsp.usp.br/sustentarea">Sustentarea</a> Research and Extension Group's project: <em>Global syndemic: the impact of anthropogenic climate change on the health and nutrition of children under five years old attended by Brazil's public health system (SUS)</em>.
+      This analysis is part of the <a href="https://www.fsp.usp.br/sustentarea">Sustentarea</a> Research and Extension Group's project: <em>Global syndemic: The impact of anthropogenic climate change on the health and nutrition of children under five years old attended by Brazil's public health system (SUS)</em>.
     </td>
   </tr>
 </table>

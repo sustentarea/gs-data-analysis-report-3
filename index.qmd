@@ -7,7 +7,7 @@ source(here::here("R", "_setup.R"))
 
 ## Overview
 
-This document explores potential associations between undernutrition in children and the Standardised Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities from 2008 to 2019. It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global Syndemic: The Impact of Anthropogenic Climate Change on the Health and Nutrition of Children Under Five Years Old Served by Brazil's Public Health System (SUS)*.
+This report explores potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index [SPEI](https://en.wikipedia.org/wiki/Standardised_Precipitation_Evapotranspiration_Index)) in Brazilian municipalities (2008–2019). It is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) Research and Extension Group's project titled *Global syndemic: The impact of anthropogenic climate change on the health and nutrition of children under five years old served by Brazil's public health system (SUS)*.
 
 ::: {.callout-warning}
 Please note that this report is designed to support decision-making and may not include all the details of the analysis.
@@ -204,6 +204,8 @@ spei_data <-
 ### Analysis Data
 
 ```{r}
+#| output: false
+
 data <- 
   gdp_data |>
   dplyr::full_join(
@@ -218,8 +220,6 @@ data <-
     year, municipality_code, misf, cobrs, mbepr, beipr, maper, 
     mpepr, gdp_per_capita, spei_12m
   )
-
-data
 ```
 
 Adjusting the data to allow only muncipalities with a minimum of $5\%$ cover from SISVAN.
@@ -795,6 +795,26 @@ This analysis is part of the [Sustentarea](https://www.fsp.usp.br/sustentarea) R
 ![](images/cnpq-logo.png){style="width: 30%;"}
 
 This research was supported by the Conselho Nacional de Desenvolvimento Científico e Tecnológico - Brazil ([CNPq](https://www.gov.br/cnpq/)).
+
+## How to Cite
+
+To cite this work, please use the following format:
+
+Magalhães, A. R., Vartanian, D, & Carvalho, A. M. (2025). *Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
+
+A BibTeX entry for LaTeX users is
+
+```         
+@techreport{magalhaes2025,
+  title = {Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)},
+  author = {{Arthur Ramalho Magalhães} and {Daniel Vartanian} and {Aline Martins de Carvalho}},
+  year = {2025},
+  address = {São Paulo},
+  institution = {Sustentarea Research and Extension Group at the University of São Paulo},
+  langid = {en},
+  url = {https://sustentarea.github.io/gs-data-analysis-report-3}
+}
+```
 
 ## References {.unnumbered}
 
