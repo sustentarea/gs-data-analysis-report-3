@@ -1,3 +1,28 @@
+# library(janitor)
+# library(polyglotr)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+
+regularize_col_names <- function(
+    data,
+    translate = TRUE,
+    source_language = "pt",
+    target_language = "en"
+) {
+  prettycheck:::assert_tibble(data)
+  prettycheck:::assert_flag(translate)
+  prettycheck:::assert_string(source_language, n.chars = 2)
+  prettycheck:::assert_string(target_language, n.chars = 2)
+
+  names(data) <- polyglotr::google_translate(
+    names(data),
+    target_language = "en",
+    source_language = "pt"
+  ) |>
+    as.character()
+
+  data |> janitor::clean_names()
+}
+
 # library(dplyr)
 # library(prettycheck) # github.com/danielvartan/prettycheck
 # library(tidyr)

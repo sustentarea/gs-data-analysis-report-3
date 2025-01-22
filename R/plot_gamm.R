@@ -1,6 +1,7 @@
 library(ggplot2)
 # library(prettycheck) # github.com/danielvartan/prettycheck
 
+source(here::here("R", "gam_str_fun.R"))
 source(here::here("R", "utils.R"))
 source(here::here("R", "utils-plots.R"))
 
@@ -8,11 +9,12 @@ plot_gamm <- function(
     data,
     model,
     x_lim = c(1.05, -1.8),
-    y_lim = c(0, 0.1),
+    y_lim = c(0, 0.175),
     breaks = seq(y_lim[1], y_lim[2], 0.025),
     title = NULL,
-    x_label = "Standardised Precipitation Evapotranspiration Index (12m)",
-    y_label = "Predicted",
+    subtitle = gam_str_fun(model, fix_all_but = 1),
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability",
     print = TRUE
   ) {
   prettycheck:::assert_tibble(data)
@@ -25,6 +27,12 @@ plot_gamm <- function(
   prettycheck:::assert_string(x_label, null.ok = TRUE)
   prettycheck:::assert_string(y_label, null.ok = TRUE)
   prettycheck:::assert_flag(print)
+
+  prettycheck:::assert_multi_class(
+    subtitle,
+    c("character", "latexexpression"),
+    null.ok = TRUE
+  )
 
   plot <-
     data |>
@@ -41,6 +49,7 @@ plot_gamm <- function(
     ) +
     ggplot2::labs(
       title = title,
+      subtitle = subtitle,
       x = x_label,
       y = y_label
     ) +
@@ -52,9 +61,6 @@ plot_gamm <- function(
 
   if (isTRUE(print)) print(plot)
 
-  list(
-
-  )
   invisible(plot)
 }
 
@@ -63,7 +69,7 @@ plot_gamm <- function(
 # library(prettycheck) # github.com/danielvartan/prettycheck
 # library(stats)
 
-data_plot_gamm <- function(data, model, type = 1, resolution = 200) {
+data_plot_gamm <- function(data, model, type = 1, resolution = 500) {
   prettycheck:::assert_tibble(data)
   prettycheck:::assert_choice("spei_12m", names(data))
   prettycheck:::assert_class(model, "gam")
@@ -141,8 +147,9 @@ plot_gamm_misfs <- function(
     y_lim = NULL,
     breaks = NULL,
     title = NULL,
-    x_label = "Standardised Precipitation Evapotranspiration Index (12m)",
-    y_label = "Predicted",
+    subtitle = TRUE,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability",
     print = TRUE
   ) {
   categories <- c("A", "B", "C", "D")
@@ -157,6 +164,7 @@ plot_gamm_misfs <- function(
   prettycheck:::assert_numeric(y_lim, null_ok = TRUE)
   prettycheck::assert_length(y_lim, 2, null_ok = TRUE)
   prettycheck:::assert_string(title, null.ok = TRUE)
+  prettycheck:::assert_flag(subtitle)
   prettycheck:::assert_string(x_label, null.ok = TRUE)
   prettycheck:::assert_string(y_label, null.ok = TRUE)
   prettycheck:::assert_flag(print)
@@ -176,7 +184,7 @@ plot_gamm_misfs <- function(
   if (is.null(y_lim)) {
     y_lim <-c(
       0,
-      0.15
+      0.175
       # find_gamm_misfs_y_max(data, gamm_models) |> round(2)
     )
   }
@@ -190,6 +198,7 @@ plot_gamm_misfs <- function(
       x_lim = x_lim,
       y_lim = y_lim,
       breaks = breaks,
+      subtitle = TRUE,
       x_label = x_label,
       y_label = y_label
     )
@@ -200,6 +209,7 @@ plot_gamm_misfs <- function(
       x_lim = x_lim,
       y_lim = y_lim,
       breaks = breaks,
+      subtitle = TRUE,
       x_label = x_label,
       y_label = y_label
     )
@@ -233,10 +243,11 @@ plot_gamm_misfs_type_1  <- function(
     data,
     gamm_models,
     x_lim = c(1.05, -1.8),
-    y_lim = c(0, 0.15),
+    y_lim = c(0, 0.175),
     breaks = NULL,
+    subtitle = TRUE,
     x_label = "Standardised Precipitation Evapotranspiration Index (12m)",
-    y_label = "Predicted"
+    y_label = "Predicted probability"
   ) {
   categories <- c("A", "B", "C", "D")
   gamm_plots <- list()
@@ -246,6 +257,12 @@ plot_gamm_misfs_type_1  <- function(
       data |>
       dplyr::filter(misf == i)
 
+    if (isTRUE(subtitle)) {
+      i_subtitle <- gam_str_fun(gamm_models[[i]])
+    } else {
+      i_subtitle <- NULL
+    }
+
     i_plot <-
       plot_gamm(
         data = i_data,
@@ -254,6 +271,7 @@ plot_gamm_misfs_type_1  <- function(
         y_lim = y_lim,
         breaks = breaks,
         title = i,
+        subtitle = NULL,
         x_label = x_label,
         y_label = y_label,
         print = FALSE
@@ -277,10 +295,11 @@ plot_gamm_misfs_type_2  <- function(
     data,
     gamm_models,
     x_lim = c(2008, 2019),
-    y_lim = c(0, 0.15),
+    y_lim = c(0, 0.175),
     breaks = NULL,
+    subtitle = TRUE,
     x_label = "Years",
-    y_label = "Predicted"
+    y_label = "Predicted probability"
   ) {
   categories <- c("A", "B", "C", "D")
   gamm_plots <- list()
@@ -289,6 +308,12 @@ plot_gamm_misfs_type_2  <- function(
     i_data <-
       data |>
       dplyr::filter(misf == i)
+
+    if (isTRUE(subtitle)) {
+      i_subtitle <- gam_str_fun(gamm_models[[i]])
+    } else {
+      i_subtitle <- NULL
+    }
 
     i_plot <-
       i_data |>
@@ -305,6 +330,7 @@ plot_gamm_misfs_type_2  <- function(
       ) +
       ggplot2::labs(
         title = i,
+        subtitle = i_subtitle,
         x = x_label,
         y = y_label
       ) +

@@ -56,8 +56,6 @@ color:
   light: white
   dark: black
 
-# See: https://fonts.google.com
-
 typography:
   fonts:
     # Main fonts
@@ -106,7 +104,6 @@ defaults:
         fig-align: center
         cap-location: top
         callout-appearance: simple
-        link-external-newwindow: true
         other-links:
           - text: Sustentarea website
             href: https://www.fsp.usp.br/sustentarea

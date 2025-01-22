@@ -25,11 +25,15 @@ date: today
 date-format: "YYYY-MM-DD"
 
 website:
-  open-graph: true
   favicon: images/favicon.png
   repo-url: https://github.com/sustentarea/gs-data-analysis-report-3/
   site-url: https://sustentarea.github.io/gs-data-analysis-report-3/
   issue-url: https://github.com/sustentarea/gs-data-analysis-report-3/issues/
+  open-graph:
+    image: images/og-image.png
+    image-width: 2400
+    image-height: 1600
+    image-alt: Sustentarea Research and Extension Group
   repo-branch: main
   repo-actions: [edit, source, issue]
   search: false
@@ -68,11 +72,9 @@ format:
     callout-appearance: simple
     csl: csl/english-apa-author-date.csl
     theme: [cosmo, scss/styles.scss, brand]
-    link-external-icon: false
-    link-external-newwindow: false
     other-links:
       - text: Sustentarea website
         href: https://www.fsp.usp.br/sustentarea
 
-google-scholar: false
+google-scholar: true
 bibliography: references.bib

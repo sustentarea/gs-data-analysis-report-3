@@ -21,10 +21,6 @@ body {
   color: $brand-grey;
 }
 
-quarto-float-caption-top {
-  margin-bottom: 1em;
-}
-
 /* Navigation ----- */
 
 .sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
@@ -71,15 +67,15 @@ code a:any-link {
   text-align: left;
 }
 
-.legend {
-  font-size: .9rem;
-  color: $black;
-}
-
 .quarto-float-caption-top {
   font-size: .9rem;
   color: $black;
   margin-bottom: 2em;
+}
+
+.legend {
+  font-size: .9rem;
+  color: $black;
 }
 
 /* Others ----- */
