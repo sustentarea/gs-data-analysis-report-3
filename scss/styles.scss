@@ -59,12 +59,18 @@ code a:any-link {
   color: $brand-black;
 }
 
+/* Figures ----- */
+
+figure.figure {
+  text-align: center;
+}
+
 /* Captions ----- */
 
 .panel-caption, .figure-caption, .subfigure-caption, .table-caption, figcaption, caption {
   color: $tertiary;
   font-size: 0.9rem;
-  text-align: left;
+  text-align: center;
 }
 
 .quarto-float-caption-top {

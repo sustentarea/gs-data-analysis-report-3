@@ -76,7 +76,7 @@ source(here::here("R", "utils.R"))
 scale_color_brand_d <- function(
     aesthetics = "color",
     scale_type = "d",
-    color_type = "seq",
+    color_type = "qual",
     direction = 1,
     ...
   ) {
@@ -110,7 +110,7 @@ scale_colour_brand_b <- scale_color_brand_b
 scale_fill_brand_d <- function(
     aesthetics = "fill",
     scale_type = "d",
-    color_type = "seq",
+    color_type = "qual",
     direction = 1,
     ...
   ) {
@@ -365,4 +365,81 @@ scale_fill_rainbow <- function(direction = 1) {
   if (direction == -1) colors <- rev(colors)
 
   ggplot2::scale_fill_manual(values = colors)
+}
+
+# library(cli)
+# library(dplyr)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+# library(rutils) # github.com/danielvartan/rutils
+library(rlang)
+
+get_map_fill_data <- function(
+    data,
+    col_fill = NULL,
+    col_code,
+    name_col_value = "n",
+    name_col_ref = col_code,
+    quiet = FALSE
+) {
+  prettycheck:::assert_tibble(data)
+  prettycheck:::assert_string(col_fill, null.ok = TRUE)
+  prettycheck:::assert_choice(col_fill, names(data), null.ok = TRUE)
+  prettycheck:::assert_string(col_code)
+  prettycheck:::assert_choice(col_code, names(data))
+  prettycheck:::assert_string(name_col_value)
+  prettycheck:::assert_string(name_col_ref)
+  prettycheck:::assert_flag(quiet)
+
+  if (is.null(col_fill)) {
+    data |>
+      dplyr::rename(!!as.symbol(name_col_ref) := !!as.symbol(col_code)) |>
+      dplyr::select(!!as.symbol(name_col_ref)) |>
+      tidyr::drop_na() |>
+      dplyr::count(!!as.symbol(name_col_ref))
+  } else {
+    prettycheck:::assert_numeric(data[[col_fill]], null_ok = TRUE)
+
+    out <-
+      data |>
+      dplyr::rename(
+        !!as.symbol(name_col_ref) := !!as.symbol(col_code),
+        !!as.symbol(name_col_value) := !!as.symbol(col_fill)
+      ) |>
+      dplyr::select(!!as.symbol(name_col_ref), !!as.symbol(name_col_value)) |>
+      tidyr::drop_na()
+
+    if (any(duplicated(out[[name_col_ref]]))) {
+      cli::cli_alert_warning(
+        paste0(
+          "There are duplicated values in ",
+          "{.strong {cli::col_red(col_code)}}. ",
+          "{.strong {cli::col_blue(col_fill)}} will be aggregated ",
+          "using the mean."
+        )
+      ) |>
+        rutils::shush(quiet)
+
+      out |>
+        dplyr::summarise(
+          !!as.symbol(name_col_value) := mean(!!as.symbol(name_col_value)),
+          .by = !!as.symbol(name_col_ref)
+        )
+    } else{
+      out
+    }
+  }
+}
+
+# library(gginnards)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+
+rm_scale <- function(plot) {
+  prettycheck:::assert_class(plot, "gg")
+
+  # plot$layers[[3]]$constructor[[1]][[3]]
+  # plot$layers[[3]] <- NULL
+
+  plot |>
+    gginnards::delete_layers("GeomScaleBar") |>
+    gginnards::delete_layers("GeomNorthArrow")
 }

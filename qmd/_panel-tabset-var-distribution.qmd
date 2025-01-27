@@ -1,0 +1,445 @@
+:::: {.panel-tabset}
+#### `year`
+
+::: {#tbl-var-distribution-freqs-year-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::freq(
+    var = year,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Frequencies of the `year` variable.
+:::
+
+::: {#fig-var-distribution-charts-year-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_bar(
+    col = 'year',
+    y_label = 'year'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Bar plot of the `year` variable.
+:::
+
+#### `misf`
+
+::: {#tbl-var-distribution-freqs-misf-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::freq(
+    var = misf,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Frequencies of the `misf` variable.
+:::
+
+::: {#fig-var-distribution-charts-misf-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_bar(
+    col = 'misf',
+    y_label = 'misf'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Bar plot of the `misf` variable.
+:::
+
+#### `number_of_children`
+
+::: {#tbl-var-distribution-stats-number-of-children-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = number_of_children,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `number_of_children` variable.
+:::
+
+::: {#fig-var-distribution-charts-number-of-children-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'number_of_children',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `number_of_children` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `sisvan_cover`
+
+::: {#tbl-var-distribution-stats-sisvan-cover-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = sisvan_cover,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `sisvan_cover` variable.
+:::
+
+::: {#fig-var-distribution-charts-sisvan-cover-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'sisvan_cover',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `sisvan_cover` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `mbepr`
+
+::: {#tbl-var-distribution-stats-mbepr-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = mbepr,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `mbepr` variable.
+:::
+
+::: {#fig-var-distribution-charts-mbepr-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'mbepr',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `mbepr` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `beipr`
+
+::: {#tbl-var-distribution-stats-beipr-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = beipr,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `beipr` variable.
+:::
+
+::: {#fig-var-distribution-charts-beipr-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'beipr',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `beipr` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `mbepr_beipr`
+
+::: {#tbl-var-distribution-stats-mbepr-beipr-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = mbepr_beipr,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `mbepr_beipr` variable.
+:::
+
+::: {#fig-var-distribution-charts-mbepr-beipr-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'mbepr_beipr',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `mbepr_beipr` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `maper`
+
+::: {#tbl-var-distribution-stats-maper-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = maper,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `maper` variable.
+:::
+
+::: {#fig-var-distribution-charts-maper-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'maper',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `maper` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `mpepr`
+
+::: {#tbl-var-distribution-stats-mpepr-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = mpepr,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `mpepr` variable.
+:::
+
+::: {#fig-var-distribution-charts-mpepr-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'mpepr',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `mpepr` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `maper_mpepr`
+
+::: {#tbl-var-distribution-stats-maper-mpepr-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = maper_mpepr,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `maper_mpepr` variable.
+:::
+
+::: {#fig-var-distribution-charts-maper-mpepr-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'maper_mpepr',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `maper_mpepr` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `gdp_per_capita`
+
+::: {#tbl-var-distribution-stats-gdp-per-capita-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = gdp_per_capita,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `gdp_per_capita` variable.
+:::
+
+::: {#fig-var-distribution-charts-gdp-per-capita-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'gdp_per_capita',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `gdp_per_capita` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+
+#### `spei_12m`
+
+::: {#tbl-var-distribution-stats-spei-12m-7063}
+```{r}
+#| code-fold: true
+#| output: asis
+
+data |>
+  summarytools::descr(
+    var = spei_12m,
+    style = 'rmarkdown',
+    plain.ascii = FALSE,
+    headings = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Statistics for the `spei_12m` variable.
+:::
+
+::: {#fig-var-distribution-charts-spei-12m-7063}
+```{r}
+#| code-fold: true
+
+data |>
+  plot_dist(
+    col = 'spei_12m',
+    jitter = FALSE
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Histogram of the `spei_12m` variable with a kernel density estimate, a quantile-quantile (Q-Q) plot comparing the variable to the theoretical normal distribution, and a boxplot highlighting outliers in red.
+:::
+::::

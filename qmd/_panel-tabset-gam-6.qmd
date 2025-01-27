@@ -1,0 +1,505 @@
+:::: {.panel-tabset}
+#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
+
+```{r}
+mbepr_gam_6 <- mgcv::gam(
+  mbepr ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_gam_6 |> summary()
+```
+
+::: {#tbl-mbepr-gam-6-r2}
+```{r}
+#| output: asis
+
+mbepr_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`mbepr_gam_6` model.
+:::
+
+::: {#tbl-mbepr-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+mbepr_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `mbepr_gam_6` model.
+:::
+
+::: {#tbl-mbepr-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+mbepr_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mbepr_gam_6` model.
+:::
+
+```{r}
+mbepr_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-mbepr-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = mbepr_gam_6,
+    type = 6,
+    title = 'Very Short Stature for Age versus (MBEPR) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of MBEPR'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `mbepr` as a function of the year for the `mbepr_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+
+#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
+
+```{r}
+beipr_gam_6 <- mgcv::gam(
+  beipr ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+beipr_gam_6 |> summary()
+```
+
+::: {#tbl-beipr-gam-6-r2}
+```{r}
+#| output: asis
+
+beipr_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`beipr_gam_6` model.
+:::
+
+::: {#tbl-beipr-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+beipr_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `beipr_gam_6` model.
+:::
+
+::: {#tbl-beipr-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+beipr_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `beipr_gam_6` model.
+:::
+
+```{r}
+beipr_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-beipr-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = beipr_gam_6,
+    type = 6,
+    title = 'Short Stature for Age (BEIPR) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of BEIPR'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `beipr` as a function of the year for the `beipr_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+
+#### MBEPR & BEIPR – Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)
+
+```{r}
+mbepr_beipr_gam_6 <- mgcv::gam(
+  mbepr_beipr ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_beipr_gam_6 |> summary()
+```
+
+::: {#tbl-mbepr-beipr-gam-6-r2}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`mbepr_beipr_gam_6` model.
+:::
+
+::: {#tbl-mbepr-beipr-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `mbepr_beipr_gam_6` model.
+:::
+
+::: {#tbl-mbepr-beipr-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mbepr_beipr_gam_6` model.
+:::
+
+```{r}
+mbepr_beipr_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-mbepr-beipr-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = mbepr_beipr_gam_6,
+    type = 6,
+    title = 'Very Short/Short Stature for Age (MBEPR & BEIPR) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of MBEPR & BEIPR'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `mbepr_beipr` as a function of the year for the `mbepr_beipr_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+
+#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
+
+```{r}
+maper_gam_6 <- mgcv::gam(
+  maper ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+maper_gam_6 |> summary()
+```
+
+::: {#tbl-maper-gam-6-r2}
+```{r}
+#| output: asis
+
+maper_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`maper_gam_6` model.
+:::
+
+::: {#tbl-maper-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+maper_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `maper_gam_6` model.
+:::
+
+::: {#tbl-maper-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+maper_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `maper_gam_6` model.
+:::
+
+```{r}
+maper_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-maper-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = maper_gam_6,
+    type = 6,
+    title = 'Severe Thinness for Height (MAPER) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of MAPER'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `maper` as a function of the year for the `maper_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+
+#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
+
+```{r}
+mpepr_gam_6 <- mgcv::gam(
+  mpepr ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+mpepr_gam_6 |> summary()
+```
+
+::: {#tbl-mpepr-gam-6-r2}
+```{r}
+#| output: asis
+
+mpepr_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`mpepr_gam_6` model.
+:::
+
+::: {#tbl-mpepr-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+mpepr_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `mpepr_gam_6` model.
+:::
+
+::: {#tbl-mpepr-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+mpepr_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mpepr_gam_6` model.
+:::
+
+```{r}
+mpepr_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-mpepr-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = mpepr_gam_6,
+    type = 6,
+    title = 'Thinness for Height (MPEPR) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of MPEPR'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `mpepr` as a function of the year for the `mpepr_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+
+#### MAPER & MPEPR – Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)
+
+```{r}
+maper_mpepr_gam_6 <- mgcv::gam(
+  maper_mpepr ~ year,
+  data = dplyr::mutate(data, year = factor(year, ordered = FALSE)),
+  family = mgcv::betar(link = 'logit')
+)
+```
+
+```{r}
+#| code-fold: false
+
+maper_mpepr_gam_6 |> summary()
+```
+
+::: {#tbl-maper-mpepr-gam-6-r2}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_6 |>
+  summarise_r2(
+    dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+      nrow()
+  ) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Confidence interval for the adjusted $\text{R}^{2}$ of the
+`maper_mpepr_gam_6` model.
+:::
+
+::: {#tbl-maper-mpepr-gam-6-summary-stats}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_6 |>
+  broom::glance() |>
+  tidyr::pivot_longer(dplyr::everything()) |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Summary statistics of the `maper_mpepr_gam_6` model.
+:::
+
+::: {#tbl-maper-mpepr-gam-6-coef-stats}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_6 |>
+  summarise_coefs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `maper_mpepr_gam_6` model.
+:::
+
+```{r}
+maper_mpepr_gam_6 |> mgcv::gam.check()
+```
+
+::: {#fig-maper-mpepr-gam-6-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  plot_gam(
+    model = maper_mpepr_gam_6,
+    type = 6,
+    title = 'Severe/Moderate Thinness for Height (MAPER & MPEPR) versus Years',
+    x_label = 'Years',
+    y_label = 'Predicted probability of MAPER & MPEPR'
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of `maper_mpepr` as a function of the year for the `maper_mpepr_gam_6` model. The shaded area represents the 95% prediction confidence interval.
+:::
+::::

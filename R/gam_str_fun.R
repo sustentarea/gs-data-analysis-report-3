@@ -7,10 +7,11 @@ library(magrittr)
 gam_str_fun <- function(
     model,
     digits = 3,
-    latex2exp = TRUE,
+    latex2exp = FALSE,
     fix_all_but = NULL, # Ignore the intercept coefficient
     fix_fun = "Mean",
-    coef_names = NULL # Ignore the intercept coefficient
+    coef_names = NULL, # Ignore the intercept coefficient
+    coef_labels = NULL  # Ignore the intercept coefficient
   ) {
   prettycheck:::assert_multi_class(model, "gam")
   prettycheck:::assert_number(digits)
@@ -37,11 +38,27 @@ gam_str_fun <- function(
     null.ok = TRUE
   )
 
+  prettycheck:::assert_character(
+    coef_labels,
+    any.missing = FALSE,
+    len = coef_length,
+    null.ok = TRUE
+  )
+
   if (is.null(coef_names)) {
     coef_names <-
       model$formula |>
       all.vars() |>
       magrittr::extract(-1)
+  }
+
+  if (is.null(coef_labels)) {
+    coef_labels <-
+      model$formula |>
+      as.character() |>
+      magrittr::extract(3) |>
+      stringr::str_split(" [+*] ") |>
+      unlist()
   }
 
   coef <- numeric()
@@ -53,33 +70,38 @@ gam_str_fun <- function(
       stringr::str_subset(i) %>%
       magrittr::extract(stats::coef(model), .) |>
       mean(na.rm = TRUE) |>
-      rutils:::clear_names() |>
+      unname() |>
       round(digits)
   }
 
   if (!is.null(fix_all_but)) {
-    for (i in seq_along(coef_names)[-fix_all_but]) {
-      coef_names[i] <- paste0(fix_fun, "(", coef_names[i], ")")
+    for (i in seq_along(coef_labels)[-fix_all_but]) {
+      coef_labels[i] <- paste0(fix_fun, "(", coef_labels[i], ")")
     }
   }
 
-  coef_names <-
-    coef_names |>
-    stringr::str_replace_all("\\_|\\.", " ") |>
-    stringr::str_to_title() |>
-    stringr::str_replace_all(" ", "")
+  if (isTRUE(latex2exp)) {
+    coef_labels <-
+      coef_labels |>
+      stringr::str_replace_all("\\_|\\.", " ") |>
+      stringr::str_to_title() |>
+      stringr::str_replace_all(" ", "")
+  } else {
+    coef_labels <- coef_labels
+  }
 
   out <- paste0(
-    "$", "y =", " ",
+    ifelse(isTRUE(latex2exp), "$", ""),
+    "y =", " ",
     round(stats::coef(model)[1] |> unname(), digits), " + ",
-    paste0(
+    paste(
       coef,
-      " \\times ",
-      coef_names,
-      # paste0("\\text{", coef_names, "}"),
+      ifelse(isTRUE(latex2exp), "\\times", "×"),
+      coef_labels,
+      # paste0("\\text{", coef_labels, "}"),
       collapse = " + "
     ),
-    "$"
+    ifelse(isTRUE(latex2exp), "$", "")
   )
 
   out <- out |> stringr::str_replace("\\+ \\-", "\\- ")

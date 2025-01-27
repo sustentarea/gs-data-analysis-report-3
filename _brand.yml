@@ -84,26 +84,3 @@ typography:
   link:
     color: green
     decoration: underline
-
-defaults:
-  bootstrap:
-    defaults:
-      link-decoration: underline
-      navbar-fg: white
-  quarto:
-    format:
-      html:
-        locale: en
-        language: en-us
-        toc: true
-        toc-depth: 5
-        toc-location: right
-        code-fold: true
-        code-link: true
-        df-print: paged
-        fig-align: center
-        cap-location: top
-        callout-appearance: simple
-        other-links:
-          - text: Sustentarea website
-            href: https://www.fsp.usp.br/sustentarea

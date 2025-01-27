@@ -1,3 +1,45 @@
+# library(magrittr)
+# library(pal) # gitlab.com/rpkg.dev/pal
+# library(prettycheck) # github.com/danielvartan/prettycheck
+# library(stringr)
+# library(rutils) # github.com/danielvartan/rutils
+
+md_named_tibble <- function(data, col_names = NULL, row_names = NULL) {
+  prettycheck:::assert_tibble(data, min.cols = 2)
+  prettycheck:::assert_character(data[[1]])
+
+  if (is.null(col_names)) {
+    col_names <-
+      data[-1] |>
+      names() |>
+      stringr::str_replace_all("\\_", " ") |>
+      stringr::str_to_title()
+  }
+
+  if (is.null(row_names)) row_names <- data[[1]]
+
+  data[-1] |>
+    as.data.frame() |>
+    magrittr::set_colnames(col_names) |>
+    magrittr::set_rownames(row_names) |>
+    pal::pipe_table(label = NA, digits = 10) |>
+    pal::cat_lines() |>
+    rutils::shush()
+}
+
+# library(here)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+# library(stringr)
+
+to_relative_path <- function(path, root = ".") {
+  prettycheck:::assert_string(path)
+  prettycheck:::assert_string(root)
+
+  path <- stringr::str_remove(path, here::here())
+
+  paste0(root, path)
+}
+
 # library(janitor)
 # library(polyglotr)
 # library(prettycheck) # github.com/danielvartan/prettycheck
@@ -171,4 +213,25 @@ normalize_names <- function(
   }
 
   invisible()
+}
+
+# library(clipr)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+
+vector_to_c <- function(x, quote = TRUE, clipboard = TRUE) {
+  prettycheck:::assert_atomic(x)
+
+  if (isTRUE(quote)) x <- paste0('"', x, '"')
+
+  out <- paste0("c(", paste(x, collapse = ", "), ")")
+
+  if (isTRUE(clipboard)) {
+    cli::cli_alert_info("Copied to clipboard.")
+
+    out |> clipr::write_clip()
+  }
+
+  cat(out)
+
+  invisible(out)
 }

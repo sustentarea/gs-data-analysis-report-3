@@ -9,30 +9,30 @@
 
 🌧️🌡️🌍👶📆🇧🇷🧮📉🌾🌱🍚🌽🚜🌳💧☀️🌦️📈
 
-This repository contains a report exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index [SPEI](https://en.wikipedia.org/wiki/Standardised_Precipitation_Evapotranspiration_Index)) in Brazilian municipalities (2008–2019. Access the report [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
+This repository contains a report exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index ([SPEI](https://en.wikipedia.org/wiki/Standardised_Precipitation_Evapotranspiration_Index)) in Brazilian municipalities (2008–2019). It can be access by clicking [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
 
 ## How to use
 
-The analyses contained in the report are 100% reproducible. They were made using the [R programming language](https://www.r-project.org/) and the  [Quarto](https://quarto.org/) publishing system. The [`renv`](https://rstudio.github.io/renv/) package was used to ensure that the R environment used can be restored (see `renv.lock`). The computational notebook is available in the `index.qmd` file.
+The analyses contained in the report are 100% reproducible. They were made using the [R programming language](https://www.r-project.org/) and the  [Quarto](https://quarto.org/) publishing system. The [`renv`](https://rstudio.github.io/renv/) package was used to ensure that the R environment used can be restored (see `renv.lock`).
 
 To reproduce the analyses do the following steps:
 
 1. Clone this repository.
 1. Open the R project (`gs-data-analysis-report-3.Rproj`).
 1. Run [`renv::restore()`](https://rstudio.github.io/renv//reference/restore.html) to install all software dependencies.
-1. Open and run the analysis in the computational notebook.
+1. Open `index.qmd` and run the analyses.
 
 ## How to cite
 
 To cite this work, please use the following format:
 
-Magalhães, A. R., Vartanian, D, & Carvalho, A. M. (2025). *Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
+Magalhães, A. R., Vartanian, D, & Carvalho, A. M. (2025). *Global syndemic project data analysis: Report 3: Exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)*. Sustentarea Research and Extension Group at the University of São Paulo. https://sustentarea.github.io/gs-data-analysis-report-3
 
 A BibTeX entry for LaTeX users is
 
 ```         
 @techreport{magalhaes2025,
-  title = {Global syndemic project data analysis: Report 3: Exploring the association between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)},
+  title = {Global syndemic project data analysis: Report 3: Exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index (SPEI) in Brazilian municipalities (2008–2019)},
   author = {{Arthur Ramalho Magalhães} and {Daniel Vartanian} and {Aline Martins de Carvalho}},
   year = {2025},
   address = {São Paulo},
