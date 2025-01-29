@@ -24,7 +24,8 @@ plot_brazil_point <- function(
     labels = ggplot2::waiver(),
     reverse = FALSE,
     limits = NULL,
-    print = TRUE
+    print = TRUE,
+    ...
   ) {
   prettycheck:::assert_internet()
   prettycheck:::assert_tibble(data)
@@ -51,7 +52,7 @@ plot_brazil_point <- function(
 
   brazil_state_data <-
     geobr::read_state(
-      year = 2017,
+      year = 2022,
       showProgress = FALSE
     ) |>
     rutils::shush()
@@ -123,7 +124,8 @@ plot_brazil_point <- function(
       breaks = breaks,
       labels = labels,
       reverse = reverse,
-      limits = limits
+      limits = limits,
+      ...
     ) +
     ggplot2::labs(
       x = NULL,
@@ -171,7 +173,8 @@ plot_brazil_state <- function(
     reverse = TRUE,
     limits = NULL,
     print = TRUE,
-    quiet = FALSE
+    quiet = FALSE,
+    ...
   ) {
   prettycheck:::assert_internet()
   prettycheck:::assert_tibble(data)
@@ -205,7 +208,7 @@ plot_brazil_state <- function(
     ) |>
     dplyr::right_join(
       geobr::read_state(
-        year = 2017,
+        year = 2022,
         showProgress = FALSE
       ) |>
         rutils::shush(),
@@ -251,7 +254,8 @@ plot_brazil_state <- function(
       labels = labels,
       reverse = reverse,
       limits = limits,
-      transform = transform
+      transform = transform,
+      ...
     )
 
   # if (isFALSE(binned)) {
@@ -279,7 +283,8 @@ plot_brazil_municipality <- function(
     data,
     col_fill = NULL,
     col_code = "municipality_code",
-    transform = "identity", # See `?ggplot2::scale_fill_gradient`
+    comparable_areas = FALSE, # See ?geobr::read_comparable_areas
+    transform = "identity",
     direction = 1,
     alpha = 1,
     binned = TRUE,
@@ -292,7 +297,8 @@ plot_brazil_municipality <- function(
     zero_na = FALSE,
     point = FALSE,
     print = TRUE,
-    quiet = FALSE
+    quiet = FALSE,
+    ...
   ) {
   prettycheck:::assert_internet()
   prettycheck:::assert_tibble(data)
@@ -302,6 +308,7 @@ plot_brazil_municipality <- function(
   prettycheck:::assert_string(col_code)
   prettycheck:::assert_choice(col_code, names(data))
   prettycheck:::assert_integerish(data[[col_code]])
+  prettycheck:::assert_flag(comparable_areas)
   prettycheck:::assert_multi_class(transform, c("character", "transform"))
   prettycheck:::assert_choice(direction, c(-1, 1))
   prettycheck:::assert_number(alpha, lower = 0, upper = 1)
@@ -320,21 +327,52 @@ plot_brazil_municipality <- function(
     limits, c("numeric", "function"), null.ok = TRUE
   )
 
+  if (isTRUE(comparable_areas)) {
+    geom_data <-
+      geobr::read_comparable_areas(
+        showProgress = FALSE
+      ) |>
+      rutils::shush()
+
+    out <-
+      data |>
+      dplyr::mutate(
+        amc_code =
+          purrr::map_int(
+            as.character(!!as.symbol(col_code)),
+            function(x) {
+              geom_data$list_code_muni_2010 |>
+                stringr::str_detect(x) %>%
+                magrittr::extract(geom_data$code_amc, .) |>
+                as.integer() %>%
+                ifelse(length(.) == 0, NA_integer_, .)
+            }
+          )
+      )
+
+    col_code <- "amc_code"
+  } else {
+    geom_data <-
+      geobr::read_municipality(
+        year = 2022,
+        showProgress = FALSE
+      ) |>
+      rutils::shush()
+
+    out <- data
+  }
+
   out <-
-    data |>
+    out |>
     get_map_fill_data(
       col_fill = col_fill,
       col_code = col_code,
-      name_col_ref = "code_muni",
-      quiet = quiet
+      name_col_ref = ifelse(isTRUE(comparable_areas), "code_amc", "code_muni"),
+      quiet = ifelse(isTRUE(comparable_areas), TRUE, quiet)
     ) |>
     dplyr::right_join(
-      geobr::read_municipality(
-        year = 2017,
-        showProgress = FALSE
-      ) |>
-        rutils::shush(),
-      by = "code_muni"
+      y = geom_data,
+      by = ifelse(isTRUE(comparable_areas), "code_amc", "code_muni")
     )
 
   if (isTRUE(zero_na)) {
@@ -354,14 +392,21 @@ plot_brazil_municipality <- function(
       out |>
       ggplot2::ggplot() +
       ggplot2::geom_sf(
-        ggplot2::aes(geometry = geom),
-        color = "gray75",
-        linewidth = 0.1,
-        fill = "white"
+        ggplot2::aes(geometry = geom, fill = n),
+        color = "black",
+        linewidth = 0.02
       ) +
       ggplot2::geom_sf(
-        ggplot2::aes(geometry = geom, fill = n),
-        color = NA
+        inherit.aes = FALSE,
+        ggplot2::aes(geometry = geom),
+        data = geobr::read_country(
+          year = 2020,
+          showProgress = FALSE
+        ) |>
+          rutils::shush(),
+        color = "black",
+        fill = NA,
+        linewidth = 0.05
       )
   }
 
@@ -398,7 +443,9 @@ plot_brazil_municipality <- function(
       labels = labels,
       reverse = ifelse(isTRUE(point), FALSE, reverse),
       limits = limits,
-      transform = transform
+      transform = transform,
+      na.value = "white",
+      ...
     )
 
   if (isTRUE(print)) print(plot) |> rutils::shush()
@@ -444,7 +491,7 @@ plot_brazil_municipality_point <- function(
   ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = geobr::read_state(
-        year = 2017,
+        year = 2022,
         showProgress = FALSE
       ) |>
         rutils::shush(),
@@ -488,20 +535,24 @@ animate_plot_brazil_municipality <- function(
     col_fill = NULL,
     col_group = "year",
     group_label = "Year",
+    comparable_areas = TRUE, # See ?geobr::read_comparable_areas
     suffix = NULL,
     width = 1344,
     height = 960,
     dpi = 150,
+    text_size = 20,
     ...
 ) {
   prettycheck:::assert_tibble(data)
   prettycheck:::assert_string(col_group, null.ok = TRUE)
   prettycheck:::assert_choice(col_group, names(data), null.ok = TRUE)
   prettycheck:::assert_string(group_label)
+  prettycheck:::assert_flag(comparable_areas)
   prettycheck:::assert_string(suffix, null.ok = TRUE)
   prettycheck:::assert_number(width, lower = 1)
   prettycheck:::assert_number(height, lower = 1)
   prettycheck:::assert_number(dpi, lower = 1)
+  prettycheck:::assert_number(text_size, lower = 1)
 
   if (!file.exists(here::here("images"))) dir.create(here::here("images"))
 
@@ -534,8 +585,9 @@ animate_plot_brazil_municipality <- function(
           list(
             data = i_data,
             col_fill = col_fill,
-            quiet = TRUE,
-            print = FALSE
+            comparable_areas = comparable_areas,
+            print = FALSE,
+            quiet = TRUE
           ),
           list(...)
         )
@@ -577,4 +629,31 @@ animate_plot_brazil_municipality <- function(
     )
 
   animation
+}
+
+# library(geobr)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+
+# # Helpers
+#
+# plot_brazil_map()
+# geobr::read_comparable_areas() |> plot_brazil_map()
+
+plot_brazil_map <- function(data = geobr::read_municipality()) {
+  prettycheck:::assert_data_frame(data)
+  prettycheck:::assert_class(data, "sf")
+
+  plot <-
+    data |>
+    ggplot2::ggplot() +
+    ggplot2::geom_sf(
+      ggplot2::aes(geometry = geom),
+      color = "black",
+      linewidth = 0.1,
+      fill = "white"
+    )
+
+  print(plot)
+
+  invisible(plot)
 }

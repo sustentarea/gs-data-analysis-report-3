@@ -1,42 +1,12 @@
 # library(mgcv)
 # library(prettycheck) # github.com/danielvartan/prettycheck
 
-gam_misfs <- function(data, var, type = 1) {
+gam_misfs <- function(data, formula) {
   prettycheck:::assert_tibble(data)
-  prettycheck:::assert_choice(var, names(data))
-  prettycheck:::assert_choice(type, 1:2)
+  prettycheck:::assert_formula(formula)
+  prettycheck:::assert_choice(as.character(formula)[2], names(data))
 
   categories <- c("A", "B", "C", "D")
-
-  if (type == 1) {
-    prettycheck:::assert_subset(
-      c("spei_12m", "gdp_per_capita", "year"),
-      names(data)
-    )
-
-    formula <-
-      paste0(
-        "formula(",
-        var,
-        " ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're')",
-        ")"
-      ) |>
-      str2expression() |>
-      eval()
-  } else {
-    prettycheck:::assert_subset("year", names(data))
-
-    formula <-
-      paste0(
-        "formula(",
-        var,
-        " ~ s(year)",
-        ")"
-      ) |>
-      str2expression() |>
-      eval()
-  }
-
   gam_models <- list()
 
   for (i in categories) {
@@ -47,7 +17,8 @@ gam_misfs <- function(data, var, type = 1) {
     i_model <- mgcv::gam(
       formula = formula,
       data = i_data,
-      family = mgcv::betar(link = "logit")
+      family = mgcv::betar(link = "logit"),
+      method = "REML"
     )
 
     gam_models[[i]] <- i_model
@@ -90,7 +61,14 @@ summarise_gam_misfs <- function(data, gam_models, n, ci_level = 0.95) {
 
     gam_models[[i]] |>
       summarise_r2(n = nrow(i_data)) |>
-      print()
+      print(n = Inf)
+
+    cat("\n")
+
+    gam_models[[i]] |>
+      broom::glance() |>
+      tidyr::pivot_longer(dplyr::everything()) |>
+      print(n = Inf)
   }
 
   options(pillar.sigfig = pillar_sigfig)

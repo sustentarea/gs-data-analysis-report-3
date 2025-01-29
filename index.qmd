@@ -25,11 +25,11 @@ Any additional analyses or updates will be incorporated into this report in futu
 
 The data used in this analysis have as sources:
 
-- The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita.
-- Brazil's Food and Nutrition Surveillance System ([SISVAN](https://sisaps.saude.gov.br/sisvan/)), for data on malnutrition.
-- [WorldClim](https://worldclim.org/data/index.html), for data on bioclimatic variables, which allowed us to calculate the Standardised Precipitation Evapotranspiration Index (SPEI) for municipalities in Brazil.
+- The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita [@ibgen; @ibgel].
+- Brazil's Food and Nutrition Surveillance System ([SISVAN](https://sisaps.saude.gov.br/sisvan/)), for data on malnutrition [@sisvana].
+- [WorldClim](https://worldclim.org/data/index.html), for data on bioclimatic variables, which allowed us to calculate the Standardised Precipitation Evapotranspiration Index (SPEI) for municipalities in Brazil [@harris2020; @fick2017].
 
-Some of the data are embedded in the document, while others rely on external data files available in the [data](https://github.com/sustentarea/gs-data-analysis-report-3/tree/main/data) directory of the code repository.
+Some data are imported directly from the source, while others rely on external data files available in the [data](https://github.com/sustentarea/gs-data-analysis-report-3/tree/main/data) directory of the code repository.
 
 ### Data Wrangling
 
@@ -48,6 +48,98 @@ Model of the data science process created by Wickham, Çetinkaya-Runde, and Grol
 The Tidyverse [code style guide](https://style.tidyverse.org/) and [design principles](https://design.tidyverse.org/) were followed to ensure consistency and enhance readability.
 
 All the analyses are 100% reproducible and can be run again at any time. See the [README](https://github.com/sustentarea/gs-data-analysis-report-3/blob/main/README.md) file in the code repository to learn how to run them.
+
+### Model Parameters
+
+The models were built using the `mgcv` R package [@wood]. Since the dependent variables are relative frequencies (continuous), we used the beta distribution family (@fig-beta-distributions) with a logit link function (@eq-logit-link-function)(@fig-logit-funciton)(see @casella2002[p. 591). The [REML](https://en.wikipedia.org/wiki/Restricted_maximum_likelihood) (Restricted Maximum Likelihood) method was used to estimate the smoothing parameters.
+
+$$
+\text{logit}(P) = \ln\left(\frac{P}{1 - P}\right) = \beta_{0} + \beta_{1} X_{1} + \cdots + \beta_{k} X_{k}
+$$ {#eq-logit-link-function}
+
+::: {#fig-beta-distributions}
+```{r}
+list <- 
+  dplyr::tibble(
+    alpha = c(0.5, 5, 1, 2, 2),
+    beta = c(0.5, 1, 3, 2, 5),
+    color = c(
+      "a = b == 0.5",
+      "a = 5, b = 1",
+      "a = 1, b = 3",
+      "a = 2, b = 2",
+      "a = 2, b = 5"
+    )
+  ) %>%
+  split(., seq(nrow(.)))
+
+plot <- 
+  ggplot2::ggplot(NULL, ggplot2::aes(x = x, color = color)) +
+  ggplot2::labs(
+    x = "x", 
+    y = "Probability Density Function (PDF)",
+    color = "Parameters"
+  ) +
+  ggplot2::scale_y_continuous(limits = c(0, 2.5))+
+  scale_color_brand_d()
+
+for (i in list) {
+  plot <-
+    plot +
+    ggplot2::stat_function(
+      data = dplyr::tibble(x = 0:1, color = factor(i$color)),
+      fun = stats::dbeta,
+      args = list(shape1 = i$alpha, shape2 = i$beta),
+      n = 1000,
+      linewidth = 1.5
+    )
+}
+
+plot |> print() |> rutils::shush()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Examples of beta distributions with different parameters.
+:::
+
+::: {#fig-logit-funciton}
+```{r}
+ggplot2::ggplot() +
+  ggplot2::stat_function(
+    data = dplyr::tibble(x = 0:1, color = factor(i$color)),
+    fun = stats::qlogis,
+    args = list(location = 0, scale = 1, log = FALSE),
+    n = 1000,
+    linewidth = 1.5,
+    color = get_brand_color("red")
+  ) +
+  ggplot2::geom_hline(
+    yintercept = 0, 
+    linewidth = 0.25,
+    linetype = "dashed",
+    color = get_brand_color("grey")
+  ) +
+  ggplot2::geom_vline(
+    xintercept = 0.5, 
+    linewidth = 0.25,
+    linetype = "dashed",
+    color = get_brand_color("grey")
+  ) +
+  ggplot2::lims(
+    x = c(0, 1),
+    y = c(-6, 6)
+  ) +
+  ggplot2::labs(
+    x = "Probability",
+    y = "Logit(0,1)"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Example of a logit function (i.e., the quantile function of the logistic distribution).
+:::
 
 ### Interpretation of Results
 
@@ -73,7 +165,9 @@ Classifications of wet and dry conditions using SPI and SPEI indices.
 
 #### Revised Multidimensional Index for Sustainable Food Systems (MISFS-R)
 
-The Multidimensional Index for Sustainable Food Systems (MISFS) is a tool designed to measure the sustainability of food systems at a subnational level, specifically created for Brazil, taking into account local behaviours and practices. The MISFS-R is a revised version of the MISFS, which includes new indicators and a new methodology for calculating the index [@fig-norde-2023-figure-6]. See @carvalho2021a and @norde2023 to learn more.
+Results are also presented for each cluster of the Revised Multidimensional Index for Sustainable Food Systems (MISFS-R) ([@fig-norde-2023-figure-6]).
+
+The MISFS is a tool designed to assess the sustainability of food systems at a subnational level in Brazil, incorporating local behaviors and practices. The MISFS-R is a revised version that introduces new indicators and a refined methodology for calculating the index ([@fig-norde-2023-figure-6]). For more details, see @carvalho2021a and @norde2023.
 
 ::: {#fig-norde-2023-figure-6}
 ![](images/norde-2023-figure-6.jpg){width=90%}
@@ -102,6 +196,7 @@ library(beepr)
 library(broom)
 library(cli)
 library(clipr)
+library(colorspace)
 library(dplyr)
 library(effectsize)
 library(GGally)
@@ -116,6 +211,7 @@ library(lubridate)
 library(lubritime) # github.com/danielvartan/lubritime
 library(magrittr)
 library(mgcv)
+library(mgcViz)
 library(MuMIn)
 library(pal) # gitlab.com/rpkg.dev/pal
 library(patchwork)
@@ -126,6 +222,7 @@ library(psychometric)
 library(purrr)
 library(r2glmm)
 library(ragg)
+library(RColorBrewer)
 library(readr)
 library(readxl)
 library(rutils) # github.com/danielvartan/rutils
@@ -149,15 +246,16 @@ library(summarytools)
 ```{r}
 source(here::here("R", "get_and_aggregate_sidra_by_year.R"))
 source(here::here("R", "gam_misfs.R"))
-source(here::here("R", "panel_tabset_gam.R"))
-source(here::here("R", "panel_tabset_var_distribution.R"))
-source(here::here("R", "panel_tabset_var_distribution_by_misfs.R"))
 source(here::here("R", "plot_brazil.R"))
 source(here::here("R", "plot_dist.R"))
 source(here::here("R", "plot_gam.R"))
 source(here::here("R", "plot_ggally.R"))
 source(here::here("R", "summarise_coefs.R"))
 source(here::here("R", "summarise_r2.R"))
+source(here::here("R", "tabset_panel_brazil_municipality.R"))
+source(here::here("R", "tabset_panel_gam.R"))
+source(here::here("R", "tabset_panel_var_distribution.R"))
+source(here::here("R", "tabset_panel_var_distribution_by_misfs.R"))
 source(here::here("R", "utils.R"))
 source(here::here("R", "utils-plots.R"))
 ```
@@ -227,13 +325,6 @@ nutrition_data <-
         as.integer()
     )
   ) |>
-  dplyr::filter(
-    sisvan_cover < 1,
-    number_of_children > n_mbepr,
-    number_of_children > n_beipr,
-    number_of_children > n_maper,
-    number_of_children > n_mpepr
-  ) |>
   dplyr::mutate(
     # year = as.integer(year),
     year =
@@ -253,6 +344,16 @@ nutrition_data <-
     mpepr = n_mpepr,
     n_maper_mpepr = n_maper + n_mpepr,
     maper_mpepr = n_maper_mpepr
+  ) |>
+  dplyr::filter(
+    dplyr::between(sisvan_cover, 0, 1),
+    number_of_children >= 0,
+    number_of_children > n_mbepr,
+    number_of_children > n_beipr,
+    number_of_children > mbepr_beipr,
+    number_of_children > n_maper,
+    number_of_children > n_mpepr,
+    number_of_children > maper_mpepr
   ) |>
   dplyr::mutate(
     dplyr::across(
@@ -397,6 +498,7 @@ gdp_data <-
     population = value.y,
     municipality = municipality.x
   ) |>
+  dplyr::filter(gdp >= 0, population >= 0) |>
   dplyr::mutate(
     # year = as.integer(year),
     year =
@@ -566,6 +668,25 @@ data
 ## Checking SISVAN Cover
 
 ```{r}
+brand_div_palette <- function(x) {
+  make_color_vector(
+    n_prop = x, 
+    colors = c(
+      get_brand_color("dark-red"),
+      # get_brand_color("white"),
+      get_brand_color_mix(
+        position = 950,
+        color_1 = "dark-red",
+        color_2 = "dark-red-triadic-blue",
+        alpha = 0.5
+      ),
+      get_brand_color("dark-red-triadic-blue")
+    )
+  )
+}
+```
+
+```{r}
 #| eval: false
 #| include: false
 
@@ -575,11 +696,13 @@ plot <-
   dplyr::filter(year == 2019) |>
   plot_brazil_municipality(
     col_fill = "sisvan_cover",
+    comparable_areas = TRUE,
     transform = "identity",
     breaks = seq(0, 100, 25),
     reverse = FALSE,
     limits = c(0, 100),
-    print = FALSE
+    print = FALSE,
+    palette = brand_div_palette
   ) +
   ggplot2::labs(
     title = "Year: 2019"
@@ -599,6 +722,7 @@ data |>
     col_fill = "sisvan_cover",
     col_group = "year",
     group_label = "Year",
+    comparable_areas = TRUE
     suffix = NULL,
     width = 1344,
     height = 960,
@@ -606,7 +730,8 @@ data |>
     transform = "identity",
     breaks = seq(0, 100, 25),
     reverse = FALSE,
-    limits = c(0, 100)
+    limits = c(0, 100),
+    palette = brand_div_palette
   )
 ```
 
@@ -616,11 +741,15 @@ data |>
 
 # Run this chunk to produce the panel-tabset for the plots.
 
-panel_tabset_brazil_municipality(
+tabset_panel_brazil_municipality(
   col = "sisvan_cover",
-  caption = paste0(
-    "Percentage of children under five monitored by the Brazilian Food ", 
-    "and Nutrition Surveillance System (SISVAN)"
+  caption = long_string(
+      "
+      Percentage of children under five monitored by Brazil's Food and 
+      Nutrition Surveillance System (SISVAN) across Brazil's 
+      historically comparable municipalities
+      (minimum comparable areas [@ehrl2017]).
+      "
   ),
   source = "Created by the authors based on data from @sisvana and @ibgel.",
   years = 2008:2019,
@@ -629,6 +758,143 @@ panel_tabset_brazil_municipality(
 ```
 
 {{< include ./qmd/_panel-tabset-brazil-municipality-sisvan-cover.qmd >}}
+
+## Checking SPEI Variations
+
+### Year-to-Year comparison
+
+```{r}
+#| eval: false
+#| include: false
+
+plot <-
+  data |>
+  dplyr::filter(year == 2019) |>
+  plot_brazil_municipality(
+    col_fill = "spei_12m",
+    comparable_areas = TRUE,
+    transform = "identity",
+    # breaks = c(-2, -1.83, -1.43, -1, 1, 1.42, 1.82, 2),
+    breaks = seq(-2 , 2, 0.5),
+    reverse = FALSE,
+    limits = c(-2, 2),
+    print = FALSE,
+    palette = brand_div_palette
+  ) +
+  ggplot2::labs(
+    title = "Year: 2019"
+  )
+
+plot |> print() |> rutils::shush()
+```
+
+```{r}
+#| eval: false
+
+# Run this chunk to produce the plots and the animation.
+
+data |> 
+  animate_plot_brazil_municipality(
+    col_fill = "spei_12m",
+    col_group = "year",
+    group_label = "Year",
+    comparable_areas = TRUE
+    suffix = NULL,
+    width = 1344,
+    height = 960,
+    dpi = 150,
+    transform = "identity",
+    # breaks = c(-2, -1.83, -1.43, -1, 1, 1.42, 1.82, 2),
+    breaks = seq(-2 , 2, 0.5),
+    reverse = FALSE,
+    limits = c(-2, 2),
+    palette = brand_div_palette
+  )
+```
+
+```{r}
+#| eval: false
+#| include: false
+
+# Run this chunk to produce the panel-tabset for the plots.
+
+tabset_panel_brazil_municipality(
+  col = "spei_12m",
+  caption = long_string(
+      "
+      Standardized Precipitation Evapotranspiration Index (SPEI)
+      across Brazil's historically comparable municipalities 
+      (minimum comparable areas [@ehrl2017]).
+      "
+  ),
+  source = long_string(
+      "
+      Created by the authors using data from the WorldClim 2.1
+      [Historical Monthly Weather](https://worldclim.org/data/monthlywth.html) 
+      dataset [@harris2020; @fick2017].
+      "
+  ),
+  years = 2008:2019,
+  heading = "####"
+)
+```
+
+{{< include ./qmd/_panel-tabset-brazil-municipality-spei-12m.qmd >}}
+
+### Comparison with External Data
+
+@fig-fao-2025-figure-annex-6-1 presents an independent analysis for comparison, while our results are shown in @fig-spei-comparison.
+
+::: {#fig-fao-2025-figure-annex-6-1}
+![](images/fao-2025-figure-annex-6-1.png){width=90%}
+
+[Source: Reproduced from @fao2025[Figure VI.1, p. 185].]{.legend}
+
+Average Standardized Precipitation Evapotranspiration Index (SPEI) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]).
+:::
+
+::: {#fig-spei-comparison}
+```{r}
+plot <- 
+  data |>
+  dplyr::filter(year >= 2010, year <= 2019) |>
+  plot_brazil_municipality(
+    col_fill = "spei_12m",
+    comparable_areas = TRUE,
+    transform = "identity",
+    binned = FALSE,
+    breaks = seq(-2 , 2, 0.5),
+    reverse = FALSE,
+    limits = c(-2, 2),
+    print = FALSE,
+    quiet = TRUE,
+    palette = function(x) {
+      make_color_vector(
+        n_prop = x, 
+        colors = c(
+          "#6F0322",
+          "#BC2D32",
+          "#E28668",
+          "#F9D0BC",
+          "#F1F1F3",
+          "#BBDAE9",
+          "#65A9D1",
+          "#266DB1",
+          "#0D2648"
+        )
+      )
+    }
+  ) +
+  ggplot2::labs(title = "2010-2019") +
+  ggplot2::theme(plot.title = element_text(hjust = 0.5))
+
+plot |> print() |> rutils::shush()
+```
+
+[Source: Created by the authors using data from the WorldClim 2.1 [Historical Monthly Weather](https://worldclim.org/data/monthlywth.html) dataset [@harris2020; @fick2017].]{.legend}
+
+Average Standardized Precipitation Evapotranspiration Index (SPEI) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]).
+:::
 
 ## Checking Distributions
 
@@ -641,7 +907,7 @@ panel_tabset_brazil_municipality(
 # Run this chunk to produce the panel-tabset for the distributions.
 
 data |>
-  panel_tabset_var_distribution(
+  tabset_panel_var_distribution(
     cols = c(
       "year", "misf", "number_of_children", "sisvan_cover", "mbepr", "beipr",
       "mbepr_beipr", "maper",  "mpepr", "maper_mpepr", "gdp_per_capita",
@@ -676,7 +942,7 @@ for (i in categories) {
 # Run this chunk to produce the panel-tabset for the distributions.
 
 data |>
-  panel_tabset_var_distribution_by_misfs(
+  tabset_panel_var_distribution_by_misfs(
     cols = c(
       "year", "number_of_children", "sisvan_cover", "mbepr", "beipr",
       "mbepr_beipr", "maper",  "mpepr", "maper_mpepr", "gdp_per_capita",
@@ -687,7 +953,7 @@ data |>
   )
 ```
 
-{{< include ./qmd/_panel-tabset-var-distribution-misfs.qmd >}}
+{{< include ./qmd/_panel-tabset-var-distribution-by-misfs.qmd >}}
 
 ## Checking Correlations
 
@@ -750,7 +1016,7 @@ Correlation matrix of the thinness variables colored by the Revised Multidimensi
 
 ## Modeling the Data
 
-### By `s(spei_12m) + gdp_per_capita + s(year, bs = "re")` (Continuous `year`)
+### By `s(spei_12m) + s(gdp_per_capita) + s(year, bs = "re")` (Continuous `year`)
 
 ```{r}
 #| eval: false
@@ -758,17 +1024,19 @@ Correlation matrix of the thinness variables colored by the Revised Multidimensi
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 1
+
 data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  panel_tabset_gam(
-    rhs_formula = "s(spei_12m) + gdp_per_capita + s(year, bs = 're')",
-    suffix = 1
+  tabset_panel_gam(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're')",
+    type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-1.qmd >}}
 
-### By `s(spei_12m) + gdp_per_capita + year` (Ordered `year`)
+### By `s(spei_12m) + s(gdp_per_capita) + year` (Ordered `year`)
 
 ::: {.callout-note}
 In this model, the `year` variable is treated as a **ordered** categorical variable.
@@ -782,16 +1050,18 @@ In this model, the `year` variable is treated as a **ordered** categorical varia
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 2
+
 data |>
-  panel_tabset_gam(
-    rhs_formula = "s(spei_12m) + gdp_per_capita + year",
-    suffix = 2
+  tabset_panel_gam(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-2.qmd >}}
 
-### By `s(spei_12m) + gdp_per_capita + year` (Unordered `year`)
+### By `s(spei_12m) + s(gdp_per_capita) + year` (Unordered `year`)
 
 ::: {.callout-note}
 In this model, the `year` variable is treated as a **unordered** categorical variable.
@@ -803,11 +1073,13 @@ In this model, the `year` variable is treated as a **unordered** categorical var
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 3
+
 data |>
   dplyr::mutate(year = factor(year, ordered = FALSE)) |>
-  panel_tabset_gam(
-    rhs_formula = "s(spei_12m) + gdp_per_capita + year",
-    suffix = 3
+  tabset_panel_gam(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    type = model_id
   )
 ```
 
@@ -821,11 +1093,13 @@ data |>
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 4
+
 data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  panel_tabset_gam(
+  tabset_panel_gam(
     rhs_formula = "s(year)",
-    suffix = 4
+    type = model_id
   )
 ```
 
@@ -845,10 +1119,12 @@ In this model, the `year` variable is treated as a **ordered** categorical varia
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 5
+
 data |>
-  panel_tabset_gam(
+  tabset_panel_gam(
     rhs_formula = "year",
-    suffix = 5
+    type = model_id
   )
 ```
 
@@ -866,297 +1142,157 @@ In this model, the `year` variable is treated as a **unordered** categorical var
 
 # Run this chunk to produce the panel-tabset for the models.
 
+model_id <- 6
+
 data |>
   dplyr::mutate(year = factor(year, ordered = FALSE)) |>
-  panel_tabset_gam(
+  tabset_panel_gam(
     rhs_formula = "year",
-    suffix = 6
+    type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-6.qmd >}}
 
-## Analyzing Model Results by MISFS-R Clusters
+## Model Results by MISFS-R Clusters
 
-### By `s(spei_12m) + gdp_per_capita + s(year, bs = "re")`
-
-#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
+### By `s(spei_12m) + s(gdp_per_capita) + s(year, bs = "re")` (Continuous `year`)
 
 ```{r}
-mbepr_gam_1_by_misfs <- 
-  data |> 
+#| eval: false
+#| include: false
+
+# Run this chunk to produce the panel-tabset for the models.
+
+model_id <- 1
+
+data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "mbepr", type = 1)
-```
-
-```{r paged.print=FALSE}
-#| code-fold: false
-
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(mbepr_gam_1_by_misfs)
-```
-
-```{r}
-#| output: asis
-
-mbepr_gam_1_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = mbepr_gam_1_by_misfs,
-    title = "Very Short Stature for Age (MBEPR) by MISFS",
-    y_label = "Predicted probability of MBEPR",
-    type = 1
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're')",
+    type = model_id
   )
 ```
 
-#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
+{{< include ./qmd/_panel-tabset-gam-1-by-misfs.qmd >}}
+
+### By `s(spei_12m) + s(gdp_per_capita) + year` (Ordered `year`)
+
+::: {.callout-note}
+In this model, the `year` variable is treated as a **ordered** categorical variable.
+
+`.L`, `.Q`, and `.C` are, respectively, the coefficients for the ordered factor coded with linear, quadratic, and cubic contrasts.
+:::
 
 ```{r}
-beipr_gam_1_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "beipr", type = 1)
-```
+#| eval: false
+#| include: false
 
-```{r paged.print=FALSE}
-#| code-fold: false
+# Run this chunk to produce the panel-tabset for the models.
 
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(beipr_gam_1_by_misfs)
-```
+model_id <- 2
 
-```{r}
-#| output: asis
-
-beipr_gam_1_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = beipr_gam_1_by_misfs,
-    title = "Short Stature for Age (BEIPR) by MISFS",
-    y_label = "Predicted probability of BEIPR",
-    type = 1
+data |>
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    type = model_id
   )
 ```
 
-#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
+{{< include ./qmd/_panel-tabset-gam-2-by-misfs.qmd >}}
+
+### By `s(spei_12m) + s(gdp_per_capita) + year` (Unordered `year`)
+
+::: {.callout-note}
+In this model, the `year` variable is treated as a **unordered** categorical variable.
+:::
 
 ```{r}
-maper_gam_1_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "maper", type = 1)
-```
+#| eval: false
+#| include: false
 
-```{r paged.print=FALSE}
-#| code-fold: false
+# Run this chunk to produce the panel-tabset for the models.
 
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(maper_gam_1_by_misfs)
-```
+model_id <- 3
 
-```{r}
-#| output: asis
-
-maper_gam_1_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = maper_gam_1_by_misfs,
-    title = "Severe Thinness for Height (MAPER) by MISFS",
-    y_label = "Predicted probability of MAPER",
-    type = 1
+data |>
+  dplyr::mutate(year = factor(year, ordered = FALSE)) |>
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    type = model_id
   )
 ```
 
-#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
+{{< include ./qmd/_panel-tabset-gam-3-by-misfs.qmd >}}
+
+### By `s(year)` (Continuous `year`)
 
 ```{r}
-mpepr_gam_1_by_misfs <- 
-  data |> 
+#| eval: false
+#| include: false
+
+# Run this chunk to produce the panel-tabset for the models.
+
+model_id <- 4
+
+data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "mpepr", type = 1)
-```
-
-```{r paged.print=FALSE}
-#| code-fold: false
-
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(mpepr_gam_1_by_misfs)
-```
-
-```{r}
-#| output: asis
-
-mpepr_gam_1_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = mpepr_gam_1_by_misfs,
-    title = "Thinness for Height (MPEPR) by MISFS",
-    y_label = "Predicted probability of MPEPR",
-    type = 1
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "s(year)",
+    type = model_id
   )
 ```
 
-### By `s(year)`
+{{< include ./qmd/_panel-tabset-gam-4-by-misfs.qmd >}}
 
-#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
+### By `year` (Ordered)
 
-```{r}
-mbepr_gam_2_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "mbepr", type = 2)
-```
+::: {.callout-note}
+In this model, the `year` variable is treated as a **ordered** categorical variable.
 
-```{r paged.print=FALSE}
-#| code-fold: false
-
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(mbepr_gam_2_by_misfs)
-```
+`.L`, `.Q`, and `.C` are, respectively, the coefficients for the ordered factor coded with linear, quadratic, and cubic contrasts.
+:::
 
 ```{r}
-#| output: asis
+#| eval: false
+#| include: false
 
-mbepr_gam_2_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
+# Run this chunk to produce the panel-tabset for the models.
 
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = mbepr_gam_2_by_misfs,
-    title = "Very Short Stature for Age (MBEPR) by MISFS",
-    x_label = "Years",
-    y_label = "Predicted probability of MBEPR",
-    type = 4
+model_id <- 5
+
+data |>
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "year",
+    type = model_id
   )
 ```
 
-#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
+{{< include ./qmd/_panel-tabset-gam-5-by-misfs.qmd >}}
+
+### By `year` (Unordered)
+
+::: {.callout-note}
+In this model, the `year` variable is treated as a **unordered** categorical variable.
+:::
 
 ```{r}
-beipr_gam_2_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "beipr", type = 2)
-```
+#| eval: false
+#| include: false
 
-```{r paged.print=FALSE}
-#| code-fold: false
+# Run this chunk to produce the panel-tabset for the models.
 
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(beipr_gam_2_by_misfs)
-```
+model_id <- 6
 
-```{r}
-#| output: asis
-
-beipr_gam_2_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = beipr_gam_2_by_misfs,
-    title = "Short Stature for Age (BEIPR) by MISFS",
-    x_label = "Years",
-    y_label = "Predicted probability of BEIPR",
-    type = 4
+data |>
+  dplyr::mutate(year = factor(year, ordered = FALSE)) |>
+  tabset_panel_gam_by_misfs(
+    rhs_formula = "year",
+    type = model_id
   )
 ```
 
-#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
-
-```{r}
-maper_gam_2_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "maper", type = 2)
-```
-
-```{r paged.print=FALSE}
-#| code-fold: false
-
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(maper_gam_2_by_misfs)
-```
-
-```{r}
-#| output: asis
-
-maper_gam_2_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = maper_gam_2_by_misfs,
-    title = "Severe Thinness for Height (MAPER) by MISFS",
-    x_label = "Years",
-    y_label = "Predicted probability of MAPER",
-    type = 4
-  )
-```
-
-#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
-
-```{r}
-mpepr_gam_2_by_misfs <- 
-  data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  gam_misfs(var = "mpepr", type = 2)
-```
-
-```{r paged.print=FALSE}
-#| code-fold: false
-
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  summarise_gam_misfs(mpepr_gam_2_by_misfs)
-```
-
-```{r}
-#| output: asis
-
-mpepr_gam_2_by_misfs |> summarise_coefs_misfs() |> md_named_tibble()
-```
-
-```{r}
-data |> 
-  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
-  plot_gam_misfs(
-    gam_models = mpepr_gam_2_by_misfs,
-    title = "Thinness for Height (MPEPR) by MISFS",
-    x_label = "Years",
-    y_label = "Predicted probability of MPEPR",
-    type = 4
-  )
-```
+{{< include ./qmd/_panel-tabset-gam-6-by-misfs.qmd >}}
 
 ## Acknowledgments
 

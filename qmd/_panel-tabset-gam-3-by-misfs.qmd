@@ -1,0 +1,307 @@
+:::: {.panel-tabset}
+#### MBEPR – Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)
+
+```{r}
+mbepr_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(mbepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(mbepr_gam_3_by_misfs)
+```
+
+::: {#tbl-mbepr-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+mbepr_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mbepr_gam_3_by_misfs` model.
+:::
+
+::: {#fig-mbepr-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = mbepr_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MBEPR"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of MBEPR (Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mbepr_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+
+#### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
+
+```{r}
+beipr_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(beipr_gam_3_by_misfs)
+```
+
+::: {#tbl-beipr-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+beipr_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `beipr_gam_3_by_misfs` model.
+:::
+
+::: {#fig-beipr-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = beipr_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of BEIPR"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of BEIPR (Short Stature for Age (*Baixa Estatura Para Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `beipr_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+
+#### MBEPR & BEIPR – Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)
+
+```{r}
+mbepr_beipr_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(mbepr_beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(mbepr_beipr_gam_3_by_misfs)
+```
+
+::: {#tbl-mbepr-beipr-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mbepr_beipr_gam_3_by_misfs` model.
+:::
+
+::: {#fig-mbepr-beipr-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = mbepr_beipr_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MBEPR & BEIPR"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of MBEPR & BEIPR (Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mbepr_beipr_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+
+#### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
+
+```{r}
+maper_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(maper ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(maper_gam_3_by_misfs)
+```
+
+::: {#tbl-maper-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+maper_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `maper_gam_3_by_misfs` model.
+:::
+
+::: {#fig-maper-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = maper_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MAPER"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of MAPER (Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `maper_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+
+#### MPEPR – Thinness for Height (*Magreza Por Estatura*)
+
+```{r}
+mpepr_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(mpepr_gam_3_by_misfs)
+```
+
+::: {#tbl-mpepr-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+mpepr_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `mpepr_gam_3_by_misfs` model.
+:::
+
+::: {#fig-mpepr-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = mpepr_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MPEPR"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of MPEPR (Thinness for Height (*Magreza Por Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mpepr_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+
+#### MAPER & MPEPR – Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)
+
+```{r}
+maper_mpepr_gam_3_by_misfs <-
+  dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  gam_misfs(maper_mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+```
+
+```{r paged.print=FALSE}
+#| code-fold: false
+
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  summarise_gam_misfs(maper_mpepr_gam_3_by_misfs)
+```
+
+::: {#tbl-maper-mpepr-gam-3-by-misfs-coef-stats}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_3_by_misfs |>
+  summarise_coefs_misfs() |>
+  md_named_tibble()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Value of the coefficients in the `maper_mpepr_gam_3_by_misfs` model.
+:::
+
+::: {#fig-maper-mpepr-gam-3-by-misfs-prediction-versus-spei}
+```{r}
+dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
+  plot_gam_misfs(
+    gam_models = maper_mpepr_gam_3_by_misfs,
+    type = 3,
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MAPER & MPEPR"
+  )
+```
+
+[Source: Created by the authors.]{.legend}
+
+Predicted probability of MAPER & MPEPR (Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `maper_mpepr_gam_3_by_misfs` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
+:::
+::::

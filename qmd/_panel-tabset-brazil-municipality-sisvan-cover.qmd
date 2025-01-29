@@ -4,9 +4,9 @@
 ::: {#fig-brazil_municipality-sisvan-cover-animation}
 ![](./images/sisvan-cover-animation.gif)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2008-2019).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2008-2019).
 :::
 
 ### 2008
@@ -14,9 +14,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2008}
 ![](./images/sisvan-cover-2008.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2008).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2008).
 :::
 
 ### 2009
@@ -24,9 +24,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2009}
 ![](./images/sisvan-cover-2009.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2009).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2009).
 :::
 
 ### 2010
@@ -34,9 +34,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2010}
 ![](./images/sisvan-cover-2010.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2010).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2010).
 :::
 
 ### 2011
@@ -44,9 +44,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2011}
 ![](./images/sisvan-cover-2011.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2011).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2011).
 :::
 
 ### 2012
@@ -54,9 +54,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2012}
 ![](./images/sisvan-cover-2012.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2012).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2012).
 :::
 
 ### 2013
@@ -64,9 +64,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2013}
 ![](./images/sisvan-cover-2013.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2013).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2013).
 :::
 
 ### 2014
@@ -74,9 +74,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2014}
 ![](./images/sisvan-cover-2014.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2014).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2014).
 :::
 
 ### 2015
@@ -84,9 +84,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2015}
 ![](./images/sisvan-cover-2015.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2015).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2015).
 :::
 
 ### 2016
@@ -94,9 +94,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2016}
 ![](./images/sisvan-cover-2016.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2016).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2016).
 :::
 
 ### 2017
@@ -104,9 +104,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2017}
 ![](./images/sisvan-cover-2017.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2017).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2017).
 :::
 
 ### 2018
@@ -114,9 +114,9 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2018}
 ![](./images/sisvan-cover-2018.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2018).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2018).
 :::
 
 ### 2019
@@ -124,8 +124,8 @@ Percentage of children under five monitored by the Brazilian Food and Nutrition 
 ::: {#fig-brazil_municipality-sisvan-cover-2019}
 ![](./images/sisvan-cover-2019.png)
 
-Source: Created by the authors based on data from @sisvana and @ibgel.
+[Source: Created by the authors based on data from @sisvana and @ibgel.]{.legend}
 
-Percentage of children under five monitored by the Brazilian Food and Nutrition Surveillance System (SISVAN) (2019).
+Percentage of children under five monitored by Brazil's Food and Nutrition Surveillance System (SISVAN) across Brazil's historically comparable municipalities (minimum comparable areas [@ehrl2017]) (2019).
 :::
 ::::

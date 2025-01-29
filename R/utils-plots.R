@@ -12,6 +12,7 @@ scale_brand <- function(
     direction = 1,
     na.value = NA, # Must follow ggplot2 arg names. # "grey50"
     reverse = FALSE,
+    palette = NULL,
     ...
   ) {
   # See <https://ggplot2.tidyverse.org/reference/scale_viridis.html>.
@@ -34,13 +35,16 @@ scale_brand <- function(
   prettycheck:::assert_choice(direction, c(-1, 1))
   prettycheck:::assert_color(na.value, na_ok = TRUE)
   prettycheck:::assert_flag(reverse)
+  prettycheck:::assert_function(palette, null.ok = TRUE)
 
-  if (color_type %in% c("seq", "sequential")) {
-    palette <- \(x) color_brand_sequential(x, direction = direction)
-  } else if (color_type %in% c("div", "diverging")) {
-    palette <- \(x) color_brand_diverging(x, direction = direction)
-  } else if (color_type %in% c("qual", "qualitative")) {
-    palette <- \(x) color_brand_qualitative(x, direction = direction)
+  if (is.null(palette)) {
+    if (color_type %in% c("seq", "sequential")) {
+      palette <- \(x) color_brand_sequential(x, direction = direction)
+    } else if (color_type %in% c("div", "diverging")) {
+      palette <- \(x) color_brand_diverging(x, direction = direction)
+    } else if (color_type %in% c("qual", "qualitative")) {
+      palette <- \(x) color_brand_qualitative(x, direction = direction)
+    }
   }
 
   if (scale_type %in% c("d", "discrete")) {
@@ -258,8 +262,10 @@ get_brand_font <- function(type) {
   }
 }
 
-# library(grDevices)
+# library(dplyr)
+# library(colorspace)
 # library(prettycheck) # github.com/danielvartan/prettycheck
+# library(scales)
 
 # # Helper
 #
@@ -273,18 +279,40 @@ get_brand_font <- function(type) {
 
 get_brand_color_tint <- function(
     position = 500,
-    color = "primary",
-    n = 1000
+    color = "primary"
   ) {
   prettycheck:::assert_integerish(position, lower = 0, upper = 1000)
-  prettycheck:::assert_integer_number(n, lower = 1)
 
   color <- get_brand_color(color)
+  position <- position |> scales::rescale(to = c(-1, 1), from = c(0, 1000))
 
-  color_fun <- grDevices::colorRampPalette(c("black", color, "white"))
-  color_values <- color_fun(n)
+  dplyr::case_when(
+    position == 0 ~ color,
+    position > 0 ~ color |> colorspace::lighten(position),
+    TRUE ~ color |> colorspace::darken(abs(position))
+  )
+}
 
-  color_values[position]
+# library(colorspace)
+# library(prettycheck) # github.com/danielvartan/prettycheck
+
+get_brand_color_mix <- function(
+    position = 500,
+    color_1 = "dark-red",
+    color_2 = "dark-red-triadic-blue",
+    alpha = 0.5
+  ) {
+  prettycheck:::assert_integerish(position, lower = 0, upper = 1000)
+  prettycheck:::assert_number(alpha, lower = 0, upper = 1)
+
+  # scales::rescale(0.9, to = c(0, 1000), from = c(-1, 1))
+
+  colorspace::mixcolor(
+    alpha,
+    get_brand_color_tint(position, color_1) |> colorspace::hex2RGB(),
+    get_brand_color_tint(position, color_2) |> colorspace::hex2RGB()
+  ) |>
+    colorspace::hex()
 }
 
 # library(grDevices)
@@ -343,28 +371,6 @@ make_color_vector <- function(
   }
 
   color_values
-}
-
-# library(grDevices)
-
-gg_color_hue <- function(n) {
-  hues = seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
-}
-
-# library(ggplot2)
-
-# Colors based on a data visualization found in @roenneberg2019b.
-
-scale_fill_rainbow <- function(direction = 1) {
-  colors <- c(
-    "#FF1E00", "#FF7C00", "#FDD400", "#00CB00", "#009DF5",
-    "#0040F7", "#981EAF"
-  )
-
-  if (direction == -1) colors <- rev(colors)
-
-  ggplot2::scale_fill_manual(values = colors)
 }
 
 # library(cli)

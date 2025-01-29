@@ -45,11 +45,28 @@ plot_gam <- function(
     x_var = "year"
   }
 
+  response_var <-
+    model$formula |>
+    all.vars() |>
+    magrittr::extract(1)
+
   plot <-
     data |>
     data_plot_gam(model, type = type) |>
     ggplot2::ggplot(
       ggplot2::aes(x = !!as.symbol(x_var), y = pred_response)
+    ) +
+    ggplot2::geom_point(
+      mapping = ggplot2::aes(
+        x = !!as.symbol(x_var),
+        y = !!as.symbol(response_var)
+      ),
+      data = data,
+      na.rm = TRUE,
+      inherit.aes = FALSE,
+      size = 0.5,
+      colour = get_brand_color_tint(900, "black"),
+      alpha = 0.25
     ) +
     ggplot2::geom_line(
       color = get_brand_color("red"),
@@ -281,118 +298,6 @@ plot_gam_misfs <- function(
     plots = gam_plots
   ) |>
     invisible()
-}
-
-plot_gam_misfs_type_1  <- function(
-    data,
-    gam_models,
-    x_lim = c(1.05, -1.8),
-    y_lim = c(0, 0.175),
-    breaks = NULL,
-    subtitle = TRUE,
-    x_label = "SPEI (12m)",
-    y_label = "Predicted probability"
-  ) {
-  categories <- c("A", "B", "C", "D")
-  gam_plots <- list()
-
-  for (i in categories) {
-    i_data <-
-      data |>
-      dplyr::filter(misf == i)
-
-    if (isTRUE(subtitle)) {
-      i_subtitle <- gam_str_fun(gam_models[[i]])
-      if (nchar(i_subtitle) > 60) i_subtitle <- NULL
-    } else {
-      i_subtitle <- NULL
-    }
-
-    i_plot <-
-      plot_gam(
-        data = i_data,
-        model = gam_models[[i]],
-        type = 1,
-        x_lim = x_lim,
-        y_lim = y_lim,
-        breaks = breaks,
-        title = i,
-        subtitle = i_subtitle,
-        x_label = x_label,
-        y_label = y_label,
-        print = FALSE
-      ) +
-      ggplot2::theme(plot.title = element_text(hjust = 0.5))
-
-    gam_plots[[i]] <- i_plot
-  }
-
-  invisible(gam_plots)
-}
-
-library(ggplot2)
-library(mgcv)
-library(rlang)
-
-source(here::here("R", "utils.R"))
-source(here::here("R", "utils-plots.R"))
-
-plot_gam_misfs_type_2  <- function(
-    data,
-    gam_models,
-    y_lim = c(0, 0.175),
-    breaks = NULL,
-    subtitle = TRUE,
-    x_label = "Years",
-    y_label = "Predicted probability"
-  ) {
-  categories <- c("A", "B", "C", "D")
-  gam_plots <- list()
-
-  for (i in categories) {
-    i_data <-
-      data |>
-      dplyr::filter(misf == i)
-
-    if (isTRUE(subtitle)) {
-      i_subtitle <- gam_str_fun(gam_models[[i]])
-      if (nchar(i_subtitle) > 60) i_subtitle <- NULL
-    } else {
-      i_subtitle <- NULL
-    }
-
-    i_plot <-
-      i_data |>
-      data_plot_gam(gam_models[[i]], type = 4) |>
-      ggplot2::ggplot(aes(x = year, y = pred_response)) +
-      ggplot2::geom_line(
-        color = get_brand_color("red"),
-        linewidth = 1
-      ) +
-      ggplot2::geom_ribbon(
-        ggplot2::aes(ymin = lower, ymax = upper),
-        alpha = 0.2,
-        fill = get_brand_color("red")
-      ) +
-      ggplot2::labs(
-        title = i,
-        subtitle = i_subtitle,
-        x = x_label,
-        y = y_label
-      ) +
-      ggplot2::scale_y_continuous(
-        breaks = breaks,
-        limits = y_lim
-      ) +
-      ggplot2::scale_x_continuous(
-        breaks = ~ grDevices::axisTicks(.x, log = FALSE)
-      ) +
-      ggplot2::theme(plot.title = element_text(hjust = 0.5))
-
-    gam_plots[[i]] <- i_plot
-  }
-
-  invisible(gam_plots)
 }
 
 # library(prettycheck) # github.com/danielvartan/prettycheck

@@ -11,7 +11,7 @@
 
 This repository contains a report exploring potential associations between childhood undernutrition and the Standardized Precipitation Evapotranspiration Index ([SPEI](https://en.wikipedia.org/wiki/Standardised_Precipitation_Evapotranspiration_Index)) in Brazilian municipalities (2008–2019). It can be access by clicking [here](https://sustentarea.github.io/gs-data-analysis-report-3/).
 
-## How to use
+## How to Use
 
 The analyses contained in the report are 100% reproducible. They were made using the [R programming language](https://www.r-project.org/) and the  [Quarto](https://quarto.org/) publishing system. The [`renv`](https://rstudio.github.io/renv/) package was used to ensure that the R environment used can be restored (see `renv.lock`).
 
@@ -22,7 +22,7 @@ To reproduce the analyses do the following steps:
 1. Run [`renv::restore()`](https://rstudio.github.io/renv//reference/restore.html) to install all software dependencies.
 1. Open `index.qmd` and run the analyses.
 
-## How to cite
+## How to Cite
 
 To cite this work, please use the following format:
 

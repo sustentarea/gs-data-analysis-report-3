@@ -3,9 +3,10 @@
 
 ```{r}
 mbepr_gam_1 <- mgcv::gam(
-  mbepr ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  mbepr ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -62,34 +63,58 @@ mbepr_gam_1 |>
 Value of the coefficients in the `mbepr_gam_1` model.
 :::
 
+::: {#fig-mbepr-gam-1-effects}
 ```{r}
-mbepr_gam_1 |> mgcv::gam.check()
+plot <- mbepr_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `mbepr_gam_1` model.
+:::
+
+::: {#fig-mbepr-gam-1-diagnostics}
+```{r}
+mbepr_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `mbepr_gam_1` model.
+:::
 
 ::: {#fig-mbepr-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = mbepr_gam_1,
     type = 1,
-    title = 'Very Short Stature for Age versus (MBEPR) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of MBEPR'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MBEPR"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `mbepr` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``mbepr_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of MBEPR (Very Short Stature for Age (*Muito Baixa Estatura Para a Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mbepr_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 
 #### BEIPR – Short Stature for Age (*Baixa Estatura Para Idade*)
 
 ```{r}
 beipr_gam_1 <- mgcv::gam(
-  beipr ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  beipr ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -146,34 +171,58 @@ beipr_gam_1 |>
 Value of the coefficients in the `beipr_gam_1` model.
 :::
 
+::: {#fig-beipr-gam-1-effects}
 ```{r}
-beipr_gam_1 |> mgcv::gam.check()
+plot <- beipr_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `beipr_gam_1` model.
+:::
+
+::: {#fig-beipr-gam-1-diagnostics}
+```{r}
+beipr_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `beipr_gam_1` model.
+:::
 
 ::: {#fig-beipr-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = beipr_gam_1,
     type = 1,
-    title = 'Short Stature for Age (BEIPR) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of BEIPR'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of BEIPR"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `beipr` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``beipr_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of BEIPR (Short Stature for Age (*Baixa Estatura Para Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `beipr_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 
 #### MBEPR & BEIPR – Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)
 
 ```{r}
 mbepr_beipr_gam_1 <- mgcv::gam(
-  mbepr_beipr ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  mbepr_beipr ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -230,34 +279,58 @@ mbepr_beipr_gam_1 |>
 Value of the coefficients in the `mbepr_beipr_gam_1` model.
 :::
 
+::: {#fig-mbepr-beipr-gam-1-effects}
 ```{r}
-mbepr_beipr_gam_1 |> mgcv::gam.check()
+plot <- mbepr_beipr_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `mbepr_beipr_gam_1` model.
+:::
+
+::: {#fig-mbepr-beipr-gam-1-diagnostics}
+```{r}
+mbepr_beipr_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `mbepr_beipr_gam_1` model.
+:::
 
 ::: {#fig-mbepr-beipr-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = mbepr_beipr_gam_1,
     type = 1,
-    title = 'Very Short/Short Stature for Age (MBEPR & BEIPR) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of MBEPR & BEIPR'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MBEPR & BEIPR"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `mbepr_beipr` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``mbepr_beipr_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of MBEPR & BEIPR (Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mbepr_beipr_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 
 #### MAPER – Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)
 
 ```{r}
 maper_gam_1 <- mgcv::gam(
-  maper ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  maper ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -314,34 +387,58 @@ maper_gam_1 |>
 Value of the coefficients in the `maper_gam_1` model.
 :::
 
+::: {#fig-maper-gam-1-effects}
 ```{r}
-maper_gam_1 |> mgcv::gam.check()
+plot <- maper_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `maper_gam_1` model.
+:::
+
+::: {#fig-maper-gam-1-diagnostics}
+```{r}
+maper_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `maper_gam_1` model.
+:::
 
 ::: {#fig-maper-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = maper_gam_1,
     type = 1,
-    title = 'Severe Thinness for Height (MAPER) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of MAPER'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MAPER"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `maper` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``maper_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of MAPER (Severe Thinness for Height (*Magreza Acentuada Para a Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `maper_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 
 #### MPEPR – Thinness for Height (*Magreza Por Estatura*)
 
 ```{r}
 mpepr_gam_1 <- mgcv::gam(
-  mpepr ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  mpepr ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -398,34 +495,58 @@ mpepr_gam_1 |>
 Value of the coefficients in the `mpepr_gam_1` model.
 :::
 
+::: {#fig-mpepr-gam-1-effects}
 ```{r}
-mpepr_gam_1 |> mgcv::gam.check()
+plot <- mpepr_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `mpepr_gam_1` model.
+:::
+
+::: {#fig-mpepr-gam-1-diagnostics}
+```{r}
+mpepr_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `mpepr_gam_1` model.
+:::
 
 ::: {#fig-mpepr-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = mpepr_gam_1,
     type = 1,
-    title = 'Thinness for Height (MPEPR) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of MPEPR'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MPEPR"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `mpepr` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``mpepr_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of MPEPR (Thinness for Height (*Magreza Por Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `mpepr_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 
 #### MAPER & MPEPR – Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)
 
 ```{r}
 maper_mpepr_gam_1 <- mgcv::gam(
-  maper_mpepr ~ s(spei_12m) + gdp_per_capita + s(year, bs = 're'),
+  maper_mpepr ~ s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're'),
   data = dplyr::mutate(data, year = as.integer(as.character(year))),
-  family = mgcv::betar(link = 'logit')
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
 )
 ```
 
@@ -482,24 +603,47 @@ maper_mpepr_gam_1 |>
 Value of the coefficients in the `maper_mpepr_gam_1` model.
 :::
 
+::: {#fig-maper-mpepr-gam-1-effects}
 ```{r}
-maper_mpepr_gam_1 |> mgcv::gam.check()
+plot <- maper_mpepr_gam_1 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
+
+for(i in plot$plots) print(i)
 ```
+
+[Source: Created by the authors.]{.legend}
+
+Effects of each term in the `maper_mpepr_gam_1` model.
+:::
+
+::: {#fig-maper-mpepr-gam-1-diagnostics}
+```{r}
+maper_mpepr_gam_1 |> mgcViz::getViz() |> mgcViz::check.gamViz()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Diagnostics for the `maper_mpepr_gam_1` model.
+:::
 
 ::: {#fig-maper-mpepr-gam-1-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::matches("^year$"),
+      .fns = ~ .x |> as.character() |> as.numeric()
+    )
+  ) |>
   plot_gam(
     model = maper_mpepr_gam_1,
     type = 1,
-    title = 'Severe/Moderate Thinness for Height (MAPER & MPEPR) versus \n Standardised Precipitation Evapotranspiration Index (12 months)',
-    x_label = 'Standardised Precipitation Evapotranspiration Index (12 months)',
-    y_label = 'Predicted probability of MAPER & MPEPR'
+    x_label = "Standardised Precipitation Evapotranspiration Index (12 months)",
+    y_label = "Predicted probability of MAPER & MPEPR"
   )
 ```
 
 [Source: Created by the authors.]{.legend}
 
-Predicted probability of `maper_mpepr` as a function of the Standardized Precipitation Evapotranspiration Index (SPEI) (12 months) for the ``maper_mpepr_gam_1`` model. The shaded area represents the 95% prediction confidence interval, with all other variables except SPEI held constant at their mean values.
+Predicted probability of MAPER & MPEPR (Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)) as a function of the smoothed 12-month Standardized Precipitation Evapotranspiration Index (SPEI), based on the `maper_mpepr_gam_1` model. All other variables are held constant at their mean values except SPEI. Shaded areas indicates the pointwise 95% prediction confidence interval, while the faded dots in the background represent the observed data.
 :::
 ::::

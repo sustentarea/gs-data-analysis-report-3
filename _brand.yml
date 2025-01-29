@@ -39,6 +39,7 @@ color:
     # Secondary Colors
     light-green: "#9ECD7A"
     dark-red: "#B44522"
+    dark-red-triadic-blue: "#4522B4" # colortools::triadic("#B44522")[3]
     # Grayscale
     white: "#FFFFFF"
     grey: "#7A7A7A"

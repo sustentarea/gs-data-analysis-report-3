@@ -27,6 +27,20 @@ test_timeline_link <- function(x, tz = "UTC") {
 }
 
 # library(prettycheck) # github.com/danielvartan/prettycheck
+
+test_null_na <- function(x) {
+  prettycheck:::assert_atomic(x)
+
+  if (is.null(x)) {
+    TRUE
+  } else if (is.na(x)) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
+# library(prettycheck) # github.com/danielvartan/prettycheck
 # library(rutils) # github.com/danielvartan/rutils
 
 source(here::here("R", "utils.R"))
