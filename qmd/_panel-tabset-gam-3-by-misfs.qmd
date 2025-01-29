@@ -4,7 +4,7 @@
 ```{r}
 mbepr_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(mbepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(mbepr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}
@@ -55,7 +55,7 @@ Predicted probability of MBEPR (Very Short Stature for Age (*Muito Baixa Estatur
 ```{r}
 beipr_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(beipr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}
@@ -106,7 +106,7 @@ Predicted probability of BEIPR (Short Stature for Age (*Baixa Estatura Para Idad
 ```{r}
 mbepr_beipr_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(mbepr_beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(mbepr_beipr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}
@@ -157,7 +157,7 @@ Predicted probability of MBEPR & BEIPR (Very Short/Short Stature for Age (*Muito
 ```{r}
 maper_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(maper ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(maper ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}
@@ -208,7 +208,7 @@ Predicted probability of MAPER (Severe Thinness for Height (*Magreza Acentuada P
 ```{r}
 mpepr_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(mpepr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}
@@ -259,7 +259,7 @@ Predicted probability of MPEPR (Thinness for Height (*Magreza Por Estatura*)) as
 ```{r}
 maper_mpepr_gam_3_by_misfs <-
   dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
-  gam_misfs(maper_mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  gam_misfs(maper_mpepr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + year)
 ```
 
 ```{r paged.print=FALSE}

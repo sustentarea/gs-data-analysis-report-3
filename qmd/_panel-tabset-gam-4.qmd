@@ -65,7 +65,7 @@ Value of the coefficients in the `mbepr_gam_4` model.
 
 ::: {#fig-mbepr-gam-4-effects}
 ```{r}
-plot <- mbepr_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- mbepr_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -73,6 +73,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `mbepr_gam_4` model.
+:::
+
+::: {#tbl-mbepr-gam-4-concurvity}
+```{r}
+#| output: asis
+
+mbepr_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mbepr_gam_4` model terms.
 :::
 
 ::: {#fig-mbepr-gam-4-diagnostics}
@@ -173,7 +189,7 @@ Value of the coefficients in the `beipr_gam_4` model.
 
 ::: {#fig-beipr-gam-4-effects}
 ```{r}
-plot <- beipr_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- beipr_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -181,6 +197,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `beipr_gam_4` model.
+:::
+
+::: {#tbl-beipr-gam-4-concurvity}
+```{r}
+#| output: asis
+
+beipr_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `beipr_gam_4` model terms.
 :::
 
 ::: {#fig-beipr-gam-4-diagnostics}
@@ -281,7 +313,7 @@ Value of the coefficients in the `mbepr_beipr_gam_4` model.
 
 ::: {#fig-mbepr-beipr-gam-4-effects}
 ```{r}
-plot <- mbepr_beipr_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- mbepr_beipr_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -289,6 +321,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `mbepr_beipr_gam_4` model.
+:::
+
+::: {#tbl-mbepr-beipr-gam-4-concurvity}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mbepr_beipr_gam_4` model terms.
 :::
 
 ::: {#fig-mbepr-beipr-gam-4-diagnostics}
@@ -389,7 +437,7 @@ Value of the coefficients in the `maper_gam_4` model.
 
 ::: {#fig-maper-gam-4-effects}
 ```{r}
-plot <- maper_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- maper_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -397,6 +445,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `maper_gam_4` model.
+:::
+
+::: {#tbl-maper-gam-4-concurvity}
+```{r}
+#| output: asis
+
+maper_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `maper_gam_4` model terms.
 :::
 
 ::: {#fig-maper-gam-4-diagnostics}
@@ -497,7 +561,7 @@ Value of the coefficients in the `mpepr_gam_4` model.
 
 ::: {#fig-mpepr-gam-4-effects}
 ```{r}
-plot <- mpepr_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- mpepr_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -505,6 +569,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `mpepr_gam_4` model.
+:::
+
+::: {#tbl-mpepr-gam-4-concurvity}
+```{r}
+#| output: asis
+
+mpepr_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mpepr_gam_4` model terms.
 :::
 
 ::: {#fig-mpepr-gam-4-diagnostics}
@@ -605,7 +685,7 @@ Value of the coefficients in the `maper_mpepr_gam_4` model.
 
 ::: {#fig-maper-mpepr-gam-4-effects}
 ```{r}
-plot <- maper_mpepr_gam_4 |>  mgcViz::getViz() |> plot()
+plot <- maper_mpepr_gam_4 |>  mgcViz::getViz() |> plot(allTerms = TRUE)
 
 for(i in plot$plots) print(i)
 ```
@@ -613,6 +693,22 @@ for(i in plot$plots) print(i)
 [Source: Created by the authors.]{.legend}
 
 Effects of each term in the `maper_mpepr_gam_4` model.
+:::
+
+::: {#tbl-maper-mpepr-gam-4-concurvity}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_4 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `maper_mpepr_gam_4` model terms.
 :::
 
 ::: {#fig-maper-mpepr-gam-4-diagnostics}

@@ -3,14 +3,14 @@
 
 ```{r}
 mbepr_gam_2_by_misfs <-
-  data |>
-  gam_misfs(mbepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(mbepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(mbepr_gam_2_by_misfs)
 ```
 
@@ -30,7 +30,7 @@ Value of the coefficients in the `mbepr_gam_2_by_misfs` model.
 
 ::: {#fig-mbepr-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -54,14 +54,14 @@ Predicted probability of MBEPR (Very Short Stature for Age (*Muito Baixa Estatur
 
 ```{r}
 beipr_gam_2_by_misfs <-
-  data |>
-  gam_misfs(beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(beipr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(beipr_gam_2_by_misfs)
 ```
 
@@ -81,7 +81,7 @@ Value of the coefficients in the `beipr_gam_2_by_misfs` model.
 
 ::: {#fig-beipr-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -105,14 +105,14 @@ Predicted probability of BEIPR (Short Stature for Age (*Baixa Estatura Para Idad
 
 ```{r}
 mbepr_beipr_gam_2_by_misfs <-
-  data |>
-  gam_misfs(mbepr_beipr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(mbepr_beipr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(mbepr_beipr_gam_2_by_misfs)
 ```
 
@@ -132,7 +132,7 @@ Value of the coefficients in the `mbepr_beipr_gam_2_by_misfs` model.
 
 ::: {#fig-mbepr-beipr-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -156,14 +156,14 @@ Predicted probability of MBEPR & BEIPR (Very Short/Short Stature for Age (*Muito
 
 ```{r}
 maper_gam_2_by_misfs <-
-  data |>
-  gam_misfs(maper ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(maper ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(maper_gam_2_by_misfs)
 ```
 
@@ -183,7 +183,7 @@ Value of the coefficients in the `maper_gam_2_by_misfs` model.
 
 ::: {#fig-maper-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -207,14 +207,14 @@ Predicted probability of MAPER (Severe Thinness for Height (*Magreza Acentuada P
 
 ```{r}
 mpepr_gam_2_by_misfs <-
-  data |>
-  gam_misfs(mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(mpepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(mpepr_gam_2_by_misfs)
 ```
 
@@ -234,7 +234,7 @@ Value of the coefficients in the `mpepr_gam_2_by_misfs` model.
 
 ::: {#fig-mpepr-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -258,14 +258,14 @@ Predicted probability of MPEPR (Thinness for Height (*Magreza Por Estatura*)) as
 
 ```{r}
 maper_mpepr_gam_2_by_misfs <-
-  data |>
-  gam_misfs(maper_mpepr ~ s(spei_12m) + s(gdp_per_capita) + year)
+  dplyr::mutate(data, year = as.integer(as.character(year))) |>
+  gam_misfs(maper_mpepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year))
 ```
 
 ```{r paged.print=FALSE}
 #| code-fold: false
 
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   summarise_gam_misfs(maper_mpepr_gam_2_by_misfs)
 ```
 
@@ -285,7 +285,7 @@ Value of the coefficients in the `maper_mpepr_gam_2_by_misfs` model.
 
 ::: {#fig-maper-mpepr-gam-2-by-misfs-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),

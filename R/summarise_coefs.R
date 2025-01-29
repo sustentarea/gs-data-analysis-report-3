@@ -14,17 +14,22 @@ summarise_coefs <- function(model) {
     unique()
 
   dplyr::tibble(
-    name = c("[Mean]", coef_names),
+    name = c(
+      "[Mean]",
+      coef_names,
+      stats::coef(model) |> names() |> setdiff(coef_names)
+    ),
     value = c(
       coef_mean(model),
       coef_names |>
         stringr::str_escape() |>
-        purrr::map_dbl(~ coef_mean(model, .x))
-    )
+        purrr::map_dbl(~ coef_mean(model, .x)),
+      stats::coef(model)[setdiff(stats::coef(model) |> names(), coef_names)]
+    ),
   ) |>
     dplyr::mutate(
       name = dplyr::case_when(
-        stringr::str_detect(name, "^s\\(") ~
+        stringr::str_detect(name, "^.*\\(.*\\)$") ~
           paste0("mean(", name, ")"),
         TRUE ~ name
       )

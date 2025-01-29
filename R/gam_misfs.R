@@ -29,6 +29,7 @@ gam_misfs <- function(data, formula) {
 
 # library(cli)
 # library(prettycheck) # github.com/danielvartan/prettycheck
+# library(tibble)
 # library(utils)
 
 # Use `paged.print=FALSE` in the code chunk!
@@ -69,6 +70,15 @@ summarise_gam_misfs <- function(data, gam_models, n, ci_level = 0.95) {
       broom::glance() |>
       tidyr::pivot_longer(dplyr::everything()) |>
       print(n = Inf)
+
+    # cat("\n")
+    #
+    # gam_models[[i]] |>
+    #   mgcv::concurvity(TRUE) |>
+    #   as.data.frame() |>
+    #   tibble::rownames_to_column("names") |>
+    #   dplyr::as_tibble() |>
+    #   print(n = Inf)
   }
 
   options(pillar.sigfig = pillar_sigfig)

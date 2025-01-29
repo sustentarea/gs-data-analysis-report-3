@@ -125,6 +125,10 @@ data_plot_gam <- function(data, model, type = 1, resolution = 500) {
           max(na.rm = TRUE),
         length.out = resolution
       ),
+      gini_index =
+        data |>
+        dplyr::pull(gini_index) |>
+        mean(na.rm = TRUE), # Keep Gini Index constant
       gdp_per_capita =
         data |>
         dplyr::pull(gdp_per_capita) |>
@@ -145,6 +149,10 @@ data_plot_gam <- function(data, model, type = 1, resolution = 500) {
           max(na.rm = TRUE),
         length.out = resolution
       ),
+      gini_index =
+        data |>
+        dplyr::pull(gini_index) |>
+        mean(na.rm = TRUE), # Keep Gini Index constant
       gdp_per_capita =
         data |>
         dplyr::pull(gdp_per_capita) |>
@@ -220,7 +228,7 @@ plot_gam_misfs <- function(
     gam_models,
     type = 1,
     x_lim = c(1.05, -1.8),
-    y_lim = c(0, 0.175),
+    y_lim = c(0, 0.3),
     breaks = seq(y_lim[1], y_lim[2], 0.05),
     title = NULL,
     subtitle = TRUE,

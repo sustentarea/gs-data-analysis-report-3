@@ -25,7 +25,7 @@ Any additional analyses or updates will be incorporated into this report in futu
 
 The data used in this analysis have as sources:
 
-- The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita [@ibgen; @ibgel].
+- The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)), for data on GDP per capita and the Gini Index [@ibgen; @ibgel].
 - Brazil's Food and Nutrition Surveillance System ([SISVAN](https://sisaps.saude.gov.br/sisvan/)), for data on malnutrition [@sisvana].
 - [WorldClim](https://worldclim.org/data/index.html), for data on bioclimatic variables, which allowed us to calculate the Standardised Precipitation Evapotranspiration Index (SPEI) for municipalities in Brazil [@harris2020; @fick2017].
 
@@ -179,7 +179,7 @@ Dendrogram for cluster analysis between Brazilian states considering all the Rev
 
 #### Pratical Significance
 
-To ensure practical significance, the adjusted $\text{R}^2$ of the models are analysed for their effect sizes considering a confidence interval of $0.95$. We use @cohen1988a benchmark for interpretation.
+To ensure practical significance, the adjusted $\text{R}^2$ of the models are analysed for their effect sizes considering a confidence interval of $95\%$. We use @cohen1988a benchmark for interpretation.
 
 A $\text{R}^2$ less than $\approx 0.0196$ is considered negligeble.
 
@@ -244,6 +244,7 @@ library(summarytools)
 ```
 
 ```{r}
+source(here::here("R", "cohens_f_squared.R"))
 source(here::here("R", "get_and_aggregate_sidra_by_year.R"))
 source(here::here("R", "gam_misfs.R"))
 source(here::here("R", "plot_brazil.R"))
@@ -254,6 +255,7 @@ source(here::here("R", "summarise_coefs.R"))
 source(here::here("R", "summarise_r2.R"))
 source(here::here("R", "tabset_panel_brazil_municipality.R"))
 source(here::here("R", "tabset_panel_gam.R"))
+source(here::here("R", "tabset_panel_gam_by_misfs.R"))
 source(here::here("R", "tabset_panel_var_distribution.R"))
 source(here::here("R", "tabset_panel_var_distribution_by_misfs.R"))
 source(here::here("R", "utils.R"))
@@ -513,6 +515,63 @@ gdp_data <-
   )
 ```
 
+### GINI Data
+
+::: {.callout-note}
+The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)) provides GINI data by municipality only for the year 1991 ([Table 115](https://sidra.ibge.gov.br/tabela/155)) [@ibgeo]. However, we found data processed by the Institute for Applied Economic Research ([IPEA](https://www.ipea.gov.br)), which had access to census data for the years 2000 and 2010 [@ibgep].
+:::
+
+Source: IBGE/IPEA – Gini Index of per capita household income by municipality: Period: 1991, 2000, and 2010 [@ibgel].
+
+```{r}
+gini_data <-
+  "http://tabnet.datasus.gov.br/cgi/ibge/censo/bases/ginibr.csv" |>
+  readr::read_delim(
+    delim = ";",
+    col_names = FALSE,
+    col_types = readr::cols(.default = "c"),
+    # locale = readr::locale(decimal_mark = ","),
+    trim_ws = TRUE,
+    skip = 3
+  ) |>
+  dplyr::rename_with(~ c("municipality", "x1991", "x2000", "x2010")) |>
+  dplyr::slice(1:5565) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::everything(),
+      .fns = ~ iconv(.x, from = "latin1", to = "UTF-8")
+    ),
+    dplyr::across(
+      .cols = dplyr::starts_with("x"),
+      .fns = ~ dplyr::case_when(
+        .x == "..." ~ NA,
+        TRUE ~ .x |> stringr::str_replace_all(",", ".")
+      )
+    ),
+    dplyr::across(
+      .cols = dplyr::starts_with("x"),
+      .fns = as.numeric
+    )
+  ) |>
+  tidyr::pivot_longer(
+    cols = starts_with("x"),
+    names_to = "year",
+    values_to = "gini_index"
+  ) |>
+  dplyr::mutate(
+    year = year |> stringr::str_remove("x") |> as.integer(),
+    municipality_code = 
+      municipality |> 
+      stringr::str_extract("\\d*") |> 
+      as.integer(),
+    municipality = 
+      municipality |> 
+      stringr::str_remove("\\d*") |> 
+      stringr::str_trim()
+  )|>
+  dplyr::relocate(year, municipality_code, .before = municipality)
+```
+
 ### SPEI Data
 
 Based on WorldClim 2.1 [Historical Monthly Weather]((https://worldclim.org/data/monthlywth.html)) dataset [@harris2020; @fick2017].
@@ -565,8 +624,8 @@ spei_data <-
 data <- 
   nutrition_data |>
   dplyr::mutate(year = year |> as.character()) |>
-  # In order to adapt the data to the municipalities in the nutrition data
-  # since it does not have the check digit.
+  # In order to adapt the data to the municipalities in the nutrition and
+  # gini data, since they do not have the check digit.
   dplyr::rename(temp_municipality_code = municipality_code) |>
   dplyr::left_join(
     y = gdp_data |> 
@@ -580,11 +639,18 @@ data <-
     by = c("year", "temp_municipality_code")
   ) |>
   dplyr::left_join(
+    y = 
+      gini_data |> 
+      dplyr::filter(year == 2010) |>
+      dplyr::select(municipality_code, gini_index) |>
+      dplyr::rename(temp_municipality_code = municipality_code),
+    by = c("temp_municipality_code"),
+    relationship = "many-to-one"
+  ) |>
+  dplyr::left_join(
     y = spei_data |>
       dplyr::mutate(
         year = year |> as.character(),
-        # In order to adapt the data to the municipalities 
-        # in the nutrition data (...)
         temp_municipality_code =
           municipality_code |>
           stringr::str_sub(end = -2) |>
@@ -592,11 +658,14 @@ data <-
       ),
     by = c("year", "temp_municipality_code")
   ) |>
-  dplyr::rename(municipality_code = municipality_code.x) |>
+  dplyr::rename(
+    municipality_code = municipality_code.x
+  ) |>
   dplyr::select(
-    year, municipality_code, misf, number_of_children, sisvan_cover, 
+    year, municipality_code, municipality, misf, 
+    number_of_children, sisvan_cover, 
     mbepr, beipr, mbepr_beipr, maper, mpepr, maper_mpepr,
-    gdp_per_capita, spei_12m
+    gini_index, gdp_per_capita, spei_12m
   ) |>
   dplyr::mutate(
     # year = as.integer(year),
@@ -607,7 +676,10 @@ data <-
         ordered = TRUE
       )
   ) |>
-  tidyr::drop_na(sisvan_cover)
+  dplyr::filter(sisvan_cover >= 0.05) |>
+  tidyr::drop_na(number_of_children, sisvan_cover)
+
+data
 ```
 
 ```{r}
@@ -639,16 +711,6 @@ dplyr::tibble(
   tidyr::pivot_longer(cols = dplyr::everything())
 ```
 
-Adjusting the data to allow only municipalities with a minimum of $5\%$ cover from SISVAN.
-
-```{r}
-data <- 
-  data |>
-  dplyr::filter(sisvan_cover >= 0.05)
-
-data
-```
-
 #### Dictionary
 
 - `year`: Year of data collection.
@@ -662,6 +724,7 @@ data
 - `maper`: Relative frequency of children under five years old with Severe Thinness for Height (*Magreza Acentuada Para a Estatura*) in the municipality.
 - `mpepr`: Relative frequency of children under five years old with Thinness for Height (*Magreza Por Estatura*) in the municipality.
 - `maper_mpepr`: Relative frequency of children under five years old with Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*) in the municipality.
+- `gini_index`: Gini index of per capita household income in the municipality.
 - `gdp_per_capita`: Gross Domestic Product (GDP) per capita in the municipality in Brazilian Reais (BRL).
 - `spei_12m`: Standardised Precipitation Evapotranspiration Index (SPEI) in a 12-month times cale for the municipality.
 
@@ -908,11 +971,9 @@ Average Standardized Precipitation Evapotranspiration Index (SPEI) across Brazil
 
 data |>
   tabset_panel_var_distribution(
-    cols = c(
-      "year", "misf", "number_of_children", "sisvan_cover", "mbepr", "beipr",
-      "mbepr_beipr", "maper",  "mpepr", "maper_mpepr", "gdp_per_capita",
-      "spei_12m"
-    ),
+    cols = 
+      names(data) |> 
+      stringr::str_subset("^municipality", negate = TRUE),
     jitter = FALSE,
     heading = "####"
   )
@@ -943,11 +1004,9 @@ for (i in categories) {
 
 data |>
   tabset_panel_var_distribution_by_misfs(
-    cols = c(
-      "year", "number_of_children", "sisvan_cover", "mbepr", "beipr",
-      "mbepr_beipr", "maper",  "mpepr", "maper_mpepr", "gdp_per_capita",
-      "spei_12m"
-    ),
+    cols = 
+      names(data) |> 
+      stringr::str_subset("^municipality", negate = TRUE),
     jitter = FALSE,
     heading = "####"
   )
@@ -964,7 +1023,9 @@ data |>
 
 data |>
   plot_ggally(
-    cols = c("year", "misf", "sisvan_cover", "gdp_per_capita", "spei_12m"),
+    cols = c(
+      "year", "misf", "sisvan_cover", "gini_index", "gdp_per_capita", "spei_12m"
+    ),
     mapping = ggplot2::aes(colour = misf)
   )
 ```
@@ -982,8 +1043,8 @@ Correlation matrix of the secondary variables colored by the Revised Multidimens
 data |>
   plot_ggally(
     cols = c(
-      "year", "misf", "mbepr", "beipr", "mbepr_beipr", "gdp_per_capita",
-      "spei_12m"
+      "year", "misf", "mbepr", "beipr", "mbepr_beipr", 
+      "gini_index", "gdp_per_capita", "spei_12m"
     ),
     mapping = ggplot2::aes(colour = misf)
   )
@@ -1002,8 +1063,8 @@ Correlation matrix of the stature variables colored by the Revised Multidimensio
 data |>
   plot_ggally(
     cols = c(
-      "year", "misf", "maper",  "mpepr", "maper_mpepr", "gdp_per_capita",
-      "spei_12m"
+      "year", "misf", "maper",  "mpepr", "maper_mpepr", 
+      "gini_index", "gdp_per_capita", "spei_12m"
     ),
     mapping = ggplot2::aes(colour = misf)
   )
@@ -1016,7 +1077,11 @@ Correlation matrix of the thinness variables colored by the Revised Multidimensi
 
 ## Modeling the Data
 
-### By `s(spei_12m) + s(gdp_per_capita) + s(year, bs = "re")` (Continuous `year`)
+::: {.callout-warning}
+Please note that in some graphics, the x-axis is inverted to improve data comprehension.
+:::
+
+### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`)
 
 ```{r}
 #| eval: false
@@ -1029,20 +1094,14 @@ model_id <- 1
 data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
   tabset_panel_gam(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're')",
+    rhs_formula = "s(spei_12m) + te(gini_index, gdp_per_capita) + s(year)",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-1.qmd >}}
 
-### By `s(spei_12m) + s(gdp_per_capita) + year` (Ordered `year`)
-
-::: {.callout-note}
-In this model, the `year` variable is treated as a **ordered** categorical variable.
-
-`.L`, `.Q`, and `.C` are, respectively, the coefficients for the ordered factor coded with linear, quadratic, and cubic contrasts.
-:::
+### By `s(spei_12m)` + `s(gini_index)` + `s(gdp_per_capita)` + `s(year)` (Ordered `year`)
 
 ```{r}
 #| eval: false
@@ -1053,15 +1112,16 @@ In this model, the `year` variable is treated as a **ordered** categorical varia
 model_id <- 2
 
 data |>
+  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
   tabset_panel_gam(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    rhs_formula = "s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year)",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-2.qmd >}}
 
-### By `s(spei_12m) + s(gdp_per_capita) + year` (Unordered `year`)
+### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `year` (Unordered `year`)
 
 ::: {.callout-note}
 In this model, the `year` variable is treated as a **unordered** categorical variable.
@@ -1078,14 +1138,14 @@ model_id <- 3
 data |>
   dplyr::mutate(year = factor(year, ordered = FALSE)) |>
   tabset_panel_gam(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    rhs_formula = "s(spei_12m) + te(gini_index, gdp_per_capita) + year",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-3.qmd >}}
 
-### By `s(year)` (Continuous `year`)
+### By `s(year)` (Continuous)
 
 ```{r}
 #| eval: false
@@ -1156,7 +1216,7 @@ data |>
 
 ## Model Results by MISFS-R Clusters
 
-### By `s(spei_12m) + s(gdp_per_capita) + s(year, bs = "re")` (Continuous `year`)
+### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`)
 
 ```{r}
 #| eval: false
@@ -1169,20 +1229,14 @@ model_id <- 1
 data |>
   dplyr::mutate(year = year |> as.character() |> as.integer()) |>
   tabset_panel_gam_by_misfs(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + s(year, bs = 're')",
+    rhs_formula = "s(spei_12m) + te(gini_index, gdp_per_capita) + s(year)",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-1-by-misfs.qmd >}}
 
-### By `s(spei_12m) + s(gdp_per_capita) + year` (Ordered `year`)
-
-::: {.callout-note}
-In this model, the `year` variable is treated as a **ordered** categorical variable.
-
-`.L`, `.Q`, and `.C` are, respectively, the coefficients for the ordered factor coded with linear, quadratic, and cubic contrasts.
-:::
+### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `year` (Unordered `year`)
 
 ```{r}
 #| eval: false
@@ -1193,15 +1247,16 @@ In this model, the `year` variable is treated as a **ordered** categorical varia
 model_id <- 2
 
 data |>
+  dplyr::mutate(year = year |> as.character() |> as.integer()) |>
   tabset_panel_gam_by_misfs(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    rhs_formula = "s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year)",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-2-by-misfs.qmd >}}
 
-### By `s(spei_12m) + s(gdp_per_capita) + year` (Unordered `year`)
+### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `year` (Unordered `year`)
 
 ::: {.callout-note}
 In this model, the `year` variable is treated as a **unordered** categorical variable.
@@ -1218,14 +1273,14 @@ model_id <- 3
 data |>
   dplyr::mutate(year = factor(year, ordered = FALSE)) |>
   tabset_panel_gam_by_misfs(
-    rhs_formula = "s(spei_12m) + s(gdp_per_capita) + year",
+    rhs_formula = "s(spei_12m) + te(gini_index, gdp_per_capita) + year",
     type = model_id
   )
 ```
 
 {{< include ./qmd/_panel-tabset-gam-3-by-misfs.qmd >}}
 
-### By `s(year)` (Continuous `year`)
+### By `s(year)` (Continuous)
 
 ```{r}
 #| eval: false
@@ -1293,6 +1348,150 @@ data |>
 ```
 
 {{< include ./qmd/_panel-tabset-gam-6-by-misfs.qmd >}}
+
+## Hypothesis Test
+
+Nested multiple linear regression models were compared to test the hypothesis that SPEI meaningfully improve the model's fit. For that, we created a restricted model (excluding SPEI) and a full model (including SPEI). To ensure practical significance, a Minimum Effect Size (MES) criterion was applied, in line with the original Neyman-Pearson framework for hypothesis testing [@neyman1928; @neyman1928a; @perezgonzalez2015]. The MES was set at a Cohen's threshold for small effects ($f^2 = 0.02$, equivalent to $\text{R}^2 = 0.01960784$) ("just barely escaping triviality" [@cohen1988a, p. 413]). Consequently, SPEI was considered significant only if its inclusion explained at least $1.960784\%$ of the variance in the dependent variable.
+
+The hypothesis test was structured as follows:
+
+- **Null hypothesis** ($\text{H}_{0}$): Adding *SPEI* does not meaningfully improve the model’s fit, indicated by a negligible change in adjusted $\text{R}^{2}$ or a non-significant F-test (with a Type I error probability ($\alpha$) of $0.05$).
+
+- **Alternative Hypothesis** ($\text{H}_{a}$): Adding *SPEI* meaningfully improves the model’s fit, indicated by an increase in adjusted $\text{R}^{2}$ exceeding the MES and a significant F-test (with $\alpha < 0.05$).
+
+Formally:
+
+$$
+\begin{cases}
+\text{H}_{0}: \Delta \ \text{Adjusted} \ \text{R}^{2} \leq \text{MES} \quad \text{or} \quad \text{F-test is not significant} \ (\alpha \geq 0.05) \\
+\text{H}_{a}: \Delta \ \text{Adjusted} \ \text{R}^{2} > \text{MES} \quad \text{and} \quad \text{F-test is significant} \ (\alpha < 0.05)
+\end{cases}
+$$
+Where:
+
+$$
+\Delta \ \text{Adjusted} \ \text{R}^{2} = \text{Adjusted} \ \text{R}^{2}_{\text{full}} - \text{Adjusted} \ \text{R}^{2}_{\text{restricted}}
+$$
+
+The restricted model is the same as the first model presented in this document, minus the SPEI variable: ~ `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`).
+
+### MBEPR & BEIPR – Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)
+
+```{r}
+mbepr_beipr_restricted <- mgcv::gam(
+  mbepr_beipr ~ te(gini_index, gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
+)
+```
+
+```{r}
+#| output: asis
+
+adj_r_squared_restricted <-
+  mbepr_beipr_restricted |>
+  summarise_r2(
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
+      nrow()
+  )
+
+adj_r_squared_restricted|> md_named_tibble()
+```
+
+```{r}
+mbepr_beipr_full <- mgcv::gam(
+  mbepr_beipr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
+)
+```
+
+```{r}
+#| output: asis
+
+adj_r_squared_full <-
+  mbepr_beipr_full |>
+  summarise_r2(
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
+      nrow()
+  )
+
+adj_r_squared_full|> md_named_tibble()
+```
+
+```{r}
+stats::anova(mbepr_beipr_restricted, mbepr_beipr_full)
+```
+
+```{r}
+effect_size <- cohens_f_squared_summary(
+  adj_r_squared_restricted, 
+  adj_r_squared_full
+  )
+
+effect_size |> list_as_tibble()
+```
+
+### MAPER & MPEPR – Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*)
+
+```{r}
+maper_mpepr_restricted <- mgcv::gam(
+  maper_mpepr ~ te(gini_index, gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
+)
+```
+
+```{r}
+#| output: asis
+
+adj_r_squared_restricted <-
+  maper_mpepr_restricted |>
+  summarise_r2(
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
+      nrow()
+  )
+
+adj_r_squared_restricted|> md_named_tibble()
+```
+
+```{r}
+maper_mpepr_full <- mgcv::gam(
+  maper_mpepr ~ s(spei_12m) + te(gini_index, gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
+  family = mgcv::betar(link = "logit"),
+  method = "REML"
+)
+```
+
+```{r}
+#| output: asis
+
+adj_r_squared_full <-
+  maper_mpepr_full |>
+  summarise_r2(
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
+      nrow()
+  )
+
+adj_r_squared_full|> md_named_tibble()
+```
+
+```{r}
+stats::anova(maper_mpepr_restricted, maper_mpepr_full)
+```
+
+```{r}
+effect_size <- cohens_f_squared_summary(
+  adj_r_squared_restricted, 
+  adj_r_squared_full
+  )
+
+effect_size |> list_as_tibble()
+```
 
 ## Acknowledgments
 

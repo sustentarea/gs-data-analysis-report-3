@@ -180,7 +180,7 @@ tabset_panel_gam <- function(
       )
     )
 
-    if (stringr::str_detect(rhs_formula, "s\\(")) {
+    if (stringr::str_detect(rhs_formula, ".*\\(")) {
       out <- c(
         out,
         "\n\n",
@@ -196,6 +196,22 @@ tabset_panel_gam <- function(
       {i_source}
 
       Effects of each term in the `{i_var}` model.
+      :::
+
+      ::: {{#tbl-{i_var_fix}-concurvity{suffix}}}
+      ```{{r}}
+      #| output: asis
+
+      {i_var} |>
+        mgcv::concurvity(TRUE) |>
+        as.data.frame() |>
+        pal::pipe_table(label = NA, digits = 10) |>
+        pal::cat_lines()
+      ```
+
+      {i_source}
+
+      Concurvity measures of the `{i_var}` model terms.
       :::
        '
         )

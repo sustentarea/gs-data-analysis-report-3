@@ -3,8 +3,8 @@
 
 ```{r}
 mbepr_gam_2 <- mgcv::gam(
-  mbepr ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  mbepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -22,7 +22,7 @@ mbepr_gam_2 |> summary()
 
 mbepr_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -75,6 +75,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `mbepr_gam_2` model.
 :::
 
+::: {#tbl-mbepr-gam-2-concurvity}
+```{r}
+#| output: asis
+
+mbepr_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mbepr_gam_2` model terms.
+:::
+
 ::: {#fig-mbepr-gam-2-diagnostics}
 ```{r}
 mbepr_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -87,7 +103,7 @@ Diagnostics for the `mbepr_gam_2` model.
 
 ::: {#fig-mbepr-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -111,8 +127,8 @@ Predicted probability of MBEPR (Very Short Stature for Age (*Muito Baixa Estatur
 
 ```{r}
 beipr_gam_2 <- mgcv::gam(
-  beipr ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  beipr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -130,7 +146,7 @@ beipr_gam_2 |> summary()
 
 beipr_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -183,6 +199,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `beipr_gam_2` model.
 :::
 
+::: {#tbl-beipr-gam-2-concurvity}
+```{r}
+#| output: asis
+
+beipr_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `beipr_gam_2` model terms.
+:::
+
 ::: {#fig-beipr-gam-2-diagnostics}
 ```{r}
 beipr_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -195,7 +227,7 @@ Diagnostics for the `beipr_gam_2` model.
 
 ::: {#fig-beipr-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -219,8 +251,8 @@ Predicted probability of BEIPR (Short Stature for Age (*Baixa Estatura Para Idad
 
 ```{r}
 mbepr_beipr_gam_2 <- mgcv::gam(
-  mbepr_beipr ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  mbepr_beipr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -238,7 +270,7 @@ mbepr_beipr_gam_2 |> summary()
 
 mbepr_beipr_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -291,6 +323,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `mbepr_beipr_gam_2` model.
 :::
 
+::: {#tbl-mbepr-beipr-gam-2-concurvity}
+```{r}
+#| output: asis
+
+mbepr_beipr_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mbepr_beipr_gam_2` model terms.
+:::
+
 ::: {#fig-mbepr-beipr-gam-2-diagnostics}
 ```{r}
 mbepr_beipr_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -303,7 +351,7 @@ Diagnostics for the `mbepr_beipr_gam_2` model.
 
 ::: {#fig-mbepr-beipr-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -327,8 +375,8 @@ Predicted probability of MBEPR & BEIPR (Very Short/Short Stature for Age (*Muito
 
 ```{r}
 maper_gam_2 <- mgcv::gam(
-  maper ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  maper ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -346,7 +394,7 @@ maper_gam_2 |> summary()
 
 maper_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -399,6 +447,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `maper_gam_2` model.
 :::
 
+::: {#tbl-maper-gam-2-concurvity}
+```{r}
+#| output: asis
+
+maper_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `maper_gam_2` model terms.
+:::
+
 ::: {#fig-maper-gam-2-diagnostics}
 ```{r}
 maper_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -411,7 +475,7 @@ Diagnostics for the `maper_gam_2` model.
 
 ::: {#fig-maper-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -435,8 +499,8 @@ Predicted probability of MAPER (Severe Thinness for Height (*Magreza Acentuada P
 
 ```{r}
 mpepr_gam_2 <- mgcv::gam(
-  mpepr ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  mpepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -454,7 +518,7 @@ mpepr_gam_2 |> summary()
 
 mpepr_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -507,6 +571,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `mpepr_gam_2` model.
 :::
 
+::: {#tbl-mpepr-gam-2-concurvity}
+```{r}
+#| output: asis
+
+mpepr_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `mpepr_gam_2` model terms.
+:::
+
 ::: {#fig-mpepr-gam-2-diagnostics}
 ```{r}
 mpepr_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -519,7 +599,7 @@ Diagnostics for the `mpepr_gam_2` model.
 
 ::: {#fig-mpepr-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
@@ -543,8 +623,8 @@ Predicted probability of MPEPR (Thinness for Height (*Magreza Por Estatura*)) as
 
 ```{r}
 maper_mpepr_gam_2 <- mgcv::gam(
-  maper_mpepr ~ s(spei_12m) + s(gdp_per_capita) + year,
-  data = data,
+  maper_mpepr ~ s(spei_12m) + s(gini_index) + s(gdp_per_capita) + s(year),
+  data = dplyr::mutate(data, year = as.integer(as.character(year))),
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
@@ -562,7 +642,7 @@ maper_mpepr_gam_2 |> summary()
 
 maper_mpepr_gam_2 |>
   summarise_r2(
-    data |>
+    dplyr::mutate(data, year = as.integer(as.character(year))) |>
       nrow()
   ) |>
   md_named_tibble()
@@ -615,6 +695,22 @@ for(i in plot$plots) print(i)
 Effects of each term in the `maper_mpepr_gam_2` model.
 :::
 
+::: {#tbl-maper-mpepr-gam-2-concurvity}
+```{r}
+#| output: asis
+
+maper_mpepr_gam_2 |>
+  mgcv::concurvity(TRUE) |>
+  as.data.frame() |>
+  pal::pipe_table(label = NA, digits = 10) |>
+  pal::cat_lines()
+```
+
+[Source: Created by the authors.]{.legend}
+
+Concurvity measures of the `maper_mpepr_gam_2` model terms.
+:::
+
 ::: {#fig-maper-mpepr-gam-2-diagnostics}
 ```{r}
 maper_mpepr_gam_2 |> mgcViz::getViz() |> mgcViz::check.gamViz()
@@ -627,7 +723,7 @@ Diagnostics for the `maper_mpepr_gam_2` model.
 
 ::: {#fig-maper-mpepr-gam-2-prediction-versus-spei}
 ```{r}
-data |>
+dplyr::mutate(data, year = as.integer(as.character(year))) |>
   dplyr::mutate(
     dplyr::across(
       .cols = dplyr::matches("^year$"),
