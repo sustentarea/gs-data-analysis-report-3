@@ -14,20 +14,6 @@ dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(mbepr_gam_6_by_misfs)
 ```
 
-::: {#tbl-mbepr-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-mbepr_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `mbepr_gam_6_by_misfs` model.
-:::
-
 ::: {#fig-mbepr-gam-6-by-misfs-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
@@ -64,20 +50,6 @@ beipr_gam_6_by_misfs <-
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(beipr_gam_6_by_misfs)
 ```
-
-::: {#tbl-beipr-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-beipr_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `beipr_gam_6_by_misfs` model.
-:::
 
 ::: {#fig-beipr-gam-6-by-misfs-prediction-versus-spei}
 ```{r}
@@ -116,20 +88,6 @@ dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(mbepr_beipr_gam_6_by_misfs)
 ```
 
-::: {#tbl-mbepr-beipr-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-mbepr_beipr_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `mbepr_beipr_gam_6_by_misfs` model.
-:::
-
 ::: {#fig-mbepr-beipr-gam-6-by-misfs-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
@@ -166,20 +124,6 @@ maper_gam_6_by_misfs <-
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(maper_gam_6_by_misfs)
 ```
-
-::: {#tbl-maper-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-maper_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `maper_gam_6_by_misfs` model.
-:::
 
 ::: {#fig-maper-gam-6-by-misfs-prediction-versus-spei}
 ```{r}
@@ -218,20 +162,6 @@ dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(mpepr_gam_6_by_misfs)
 ```
 
-::: {#tbl-mpepr-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-mpepr_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `mpepr_gam_6_by_misfs` model.
-:::
-
 ::: {#fig-mpepr-gam-6-by-misfs-prediction-versus-spei}
 ```{r}
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
@@ -268,20 +198,6 @@ maper_mpepr_gam_6_by_misfs <-
 dplyr::mutate(data, year = factor(year, ordered = FALSE)) |>
   summarise_gam_misfs(maper_mpepr_gam_6_by_misfs)
 ```
-
-::: {#tbl-maper-mpepr-gam-6-by-misfs-coef-stats}
-```{r}
-#| output: asis
-
-maper_mpepr_gam_6_by_misfs |>
-  summarise_coefs_misfs() |>
-  md_named_tibble()
-```
-
-[Source: Created by the authors.]{.legend}
-
-Value of the coefficients in the `maper_mpepr_gam_6_by_misfs` model.
-:::
 
 ::: {#fig-maper-mpepr-gam-6-by-misfs-prediction-versus-spei}
 ```{r}

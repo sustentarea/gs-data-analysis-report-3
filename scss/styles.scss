@@ -79,13 +79,13 @@ figure.figure {
 
 .quarto-float-caption-top {
   font-size: .9rem;
-  color: $black;
+  color: $brand-black;
   margin-bottom: 2em;
 }
 
 .legend {
   font-size: .9rem;
-  color: $black;
+  color: $brand-black;
 }
 
 /* Others ----- */
@@ -96,5 +96,9 @@ figure.figure {
 }
 
 .brand-green {
-  color: $primary;
+  color: $brand-green;
+}
+
+.brand-red {
+  color: $brand-red;
 }

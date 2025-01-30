@@ -11,15 +11,25 @@ This report explores potential associations between childhood undernutrition and
 
 ::: {.callout-warning}
 Please note that this report is designed to support decision-making and may not include all the details of the analysis.
+
+Any additional analyses or updates will be incorporated into the report in future revisions, if necessary.
+:::
+
+## Question
+
+This analysis seeks to address the following question:
+
+::: {style="text-align: center; font-size: 1.1em; font-weight: bold; color: #ED6B4D; padding-top: 1em; padding-bottom: 1em;"}
+Does the Standardized Precipitation Evapotranspiration Index (SPEI) significantly improve the prediction of childhood undernutrition in Brazilian municipalities?
 :::
 
 ## Methods
 
 ### Approach and Procedure Method
 
-The analysis was conducted using Generalized Additive Models ([GAMs](https://en.wikipedia.org/wiki/Generalized_additive_model)) to model and control for potential effects, alongside visual inspections of the data. Results are also presented for each cluster of the Revised Multidimensional Index for Sustainable Food Systems (MISFS-R) [@carvalho2021a; @norde2023].
+This study employed the hypothetical-deductive method, also known as the method of conjecture and refutation [@popper1979, p. 164], as its problem-solving approach. Procedurally, it applied an enhanced version of Null Hypothesis Significance Testing (NHST), grounded on the original ideas of Neyman-Pearson framework for data testing [@neyman1928; @neyman1928a; @perezgonzalez2015].
 
-Any additional analyses or updates will be incorporated into this report in future revisions, if necessary.
+The analysis was conducted using Generalized Additive Models ([GAMs](https://en.wikipedia.org/wiki/Generalized_additive_model)) to model and control for potential effects, alongside visual inspections of the data. Results are also presented for each cluster of the Revised Multidimensional Index for Sustainable Food Systems (MISFS-R) [@carvalho2021a; @norde2023].
 
 ### Source of Data/Information
 
@@ -140,6 +150,35 @@ ggplot2::ggplot() +
 
 Example of a logit function (i.e., the quantile function of the logistic distribution).
 :::
+
+### Hypothesis Testing
+
+We tested whether SPEI significantly improves model fit when predicting MBEPR & BEIPR (stunting) and MAPER & MPEPR (wasting) with nested models. We compared a restricted model (excluding SPEI) with a full model (including SPEI). To ensure practical significance, we applied a Minimum Effect Size (MES) criterion, following the original Neyman-Pearson framework for hypothesis testing [@neyman1928; @neyman1928a; @perezgonzalez2015].
+
+The MES was set at Cohen's threshold for small effects ($f^2 = 0.02$, equivalent to $\text{R}^2 = 0.01960784$). Thus, SPEI was considered significant only if its inclusion accounted for at least $1.960784\%$ of the variance in the dependent variable.
+
+The test was structured as follows:
+
+- **Null hypothesis** ($\text{H}_{0}$): Adding *SPEI* does not meaningfully improve the model’s fit, indicated by a negligible change in the adjusted $\text{R}^{2}$ or a non-significant F-test (with a Type I error probability ($\alpha$) of $0.05$).
+
+- **Alternative Hypothesis** ($\text{H}_{a}$): Adding *SPEI* meaningfully improves the model’s fit, indicated by an increase in the adjusted $\text{R}^{2}$ exceeding the MES and a significant F-test (with $\alpha < 0.05$).
+
+Formally:
+
+$$
+\begin{cases}
+\text{H}_{0}: \Delta \ \text{Adjusted} \ \text{R}^{2} \leq \text{MES} \quad \text{or} \quad \text{F-test is not significant} \ (\alpha \geq 0.05) \\
+\text{H}_{a}: \Delta \ \text{Adjusted} \ \text{R}^{2} > \text{MES} \quad \text{and} \quad \text{F-test is significant} \ (\alpha < 0.05)
+\end{cases}
+$$
+
+Where:
+
+$$
+\Delta \ \text{Adjusted} \ \text{R}^{2} = \text{Adjusted} \ \text{R}^{2}_{\text{full}} - \text{Adjusted} \ \text{R}^{2}_{\text{restricted}}
+$$
+
+The restricted model is the same as the first model presented in this document, minus the SPEI variable: ~ `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`).
 
 ### Interpretation of Results
 
@@ -515,7 +554,7 @@ gdp_data <-
   )
 ```
 
-### GINI Data
+### Gini Index Data
 
 ::: {.callout-note}
 The Brazilian Institute of Geography and Statistics ([IBGE](https://www.ibge.gov.br/)) Automatic Retrieval System ([SIDRA](https://sidra.ibge.gov.br/)) provides GINI data by municipality only for the year 1991 ([Table 115](https://sidra.ibge.gov.br/tabela/155)) [@ibgeo]. However, we found data processed by the Institute for Applied Economic Research ([IPEA](https://www.ipea.gov.br)), which had access to census data for the years 2000 and 2010 [@ibgep].
@@ -570,6 +609,19 @@ gini_data <-
       stringr::str_trim()
   )|>
   dplyr::relocate(year, municipality_code, .before = municipality)
+```
+
+```{r}
+#| eval: false
+#| include: false
+
+# Last download: 2025-01-29 (~5s)
+
+gini_data |> 
+  saveRDS(here::here("data", "ibge_gini_index.rds"))
+
+gini_data |> 
+  readr::write_csv(here::here("data", "ibge_gini_index.csv"))
 ```
 
 ### SPEI Data
@@ -724,8 +776,8 @@ dplyr::tibble(
 - `maper`: Relative frequency of children under five years old with Severe Thinness for Height (*Magreza Acentuada Para a Estatura*) in the municipality.
 - `mpepr`: Relative frequency of children under five years old with Thinness for Height (*Magreza Por Estatura*) in the municipality.
 - `maper_mpepr`: Relative frequency of children under five years old with Severe/Moderate Thinness for Height (*Magreza Acentuada/Moderada Para a Estatura*) in the municipality.
-- `gini_index`: Gini index of per capita household income in the municipality.
-- `gdp_per_capita`: Gross Domestic Product (GDP) per capita in the municipality in Brazilian Reais (BRL).
+- `gini_index`: Gini index of per capita household income in the municipality at 2010. Due to limited data availability at the municipal level, all values are based on the 2010 Brazilian Census.
+- `gdp_per_capita`: Gross Domestic Product (GDP) per capita in the municipality in Brazilian Reais (BRL) based at current prices on 2010.
 - `spei_12m`: Standardised Precipitation Evapotranspiration Index (SPEI) in a 12-month times cale for the municipality.
 
 ## Checking SISVAN Cover
@@ -1214,7 +1266,7 @@ data |>
 
 {{< include ./qmd/_panel-tabset-gam-6.qmd >}}
 
-## Model Results by MISFS-R Clusters
+## Modeling the Data by MISFS-R Clusters
 
 ### By `s(spei_12m)` + `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`)
 
@@ -1349,17 +1401,13 @@ data |>
 
 {{< include ./qmd/_panel-tabset-gam-6-by-misfs.qmd >}}
 
-## Hypothesis Test
+## Testing the Hypothesis
 
-Nested multiple linear regression models were compared to test the hypothesis that SPEI meaningfully improve the model's fit. For that, we created a restricted model (excluding SPEI) and a full model (including SPEI). To ensure practical significance, a Minimum Effect Size (MES) criterion was applied, in line with the original Neyman-Pearson framework for hypothesis testing [@neyman1928; @neyman1928a; @perezgonzalez2015]. The MES was set at a Cohen's threshold for small effects ($f^2 = 0.02$, equivalent to $\text{R}^2 = 0.01960784$) ("just barely escaping triviality" [@cohen1988a, p. 413]). Consequently, SPEI was considered significant only if its inclusion explained at least $1.960784\%$ of the variance in the dependent variable.
+::: {.callout-note}
+The rationale behind the test can be found in the Methods section.
+:::
 
-The hypothesis test was structured as follows:
-
-- **Null hypothesis** ($\text{H}_{0}$): Adding *SPEI* does not meaningfully improve the model’s fit, indicated by a negligible change in adjusted $\text{R}^{2}$ or a non-significant F-test (with a Type I error probability ($\alpha$) of $0.05$).
-
-- **Alternative Hypothesis** ($\text{H}_{a}$): Adding *SPEI* meaningfully improves the model’s fit, indicated by an increase in adjusted $\text{R}^{2}$ exceeding the MES and a significant F-test (with $\alpha < 0.05$).
-
-Formally:
+The hypothesis test was designed as follows:
 
 $$
 \begin{cases}
@@ -1367,13 +1415,8 @@ $$
 \text{H}_{a}: \Delta \ \text{Adjusted} \ \text{R}^{2} > \text{MES} \quad \text{and} \quad \text{F-test is significant} \ (\alpha < 0.05)
 \end{cases}
 $$
-Where:
 
-$$
-\Delta \ \text{Adjusted} \ \text{R}^{2} = \text{Adjusted} \ \text{R}^{2}_{\text{full}} - \text{Adjusted} \ \text{R}^{2}_{\text{restricted}}
-$$
-
-The restricted model is the same as the first model presented in this document, minus the SPEI variable: ~ `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`).
+The restricted model is identical to the first model presented in this document, except for the exclusion of the SPEI variable: ~ `te(gini_index, gdp_per_capita)` + `s(year)` (Continuous `year`).
 
 ### MBEPR & BEIPR – Very Short/Short Stature for Age (*Muito Baixa/Baixa Estatura Para Idade*)
 
@@ -1384,6 +1427,12 @@ mbepr_beipr_restricted <- mgcv::gam(
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
+```
+
+```{r}
+#| code-fold: false
+
+mbepr_beipr_restricted |> summary()
 ```
 
 ```{r}
@@ -1409,6 +1458,12 @@ mbepr_beipr_full <- mgcv::gam(
 ```
 
 ```{r}
+#| code-fold: false
+
+mbepr_beipr_full |> summary()
+```
+
+```{r}
 #| output: asis
 
 adj_r_squared_full <-
@@ -1422,7 +1477,9 @@ adj_r_squared_full|> md_named_tibble()
 ```
 
 ```{r}
-stats::anova(mbepr_beipr_restricted, mbepr_beipr_full)
+#| code-fold: false
+
+stats::anova(mbepr_beipr_restricted, mbepr_beipr_full, test = "F")
 ```
 
 ```{r}
@@ -1443,6 +1500,12 @@ maper_mpepr_restricted <- mgcv::gam(
   family = mgcv::betar(link = "logit"),
   method = "REML"
 )
+```
+
+```{r}
+#| code-fold: false
+
+maper_mpepr_restricted |> summary()
 ```
 
 ```{r}
@@ -1468,6 +1531,12 @@ maper_mpepr_full <- mgcv::gam(
 ```
 
 ```{r}
+#| code-fold: false
+
+maper_mpepr_full |> summary()
+```
+
+```{r}
 #| output: asis
 
 adj_r_squared_full <-
@@ -1481,7 +1550,9 @@ adj_r_squared_full|> md_named_tibble()
 ```
 
 ```{r}
-stats::anova(maper_mpepr_restricted, maper_mpepr_full)
+#| code-fold: false
+
+stats::anova(maper_mpepr_restricted, maper_mpepr_full, test = "F")
 ```
 
 ```{r}
@@ -1492,6 +1563,12 @@ effect_size <- cohens_f_squared_summary(
 
 effect_size |> list_as_tibble()
 ```
+
+## Conclusion
+
+Does the Standardized Precipitation Evapotranspiration Index (SPEI) significantly improve the prediction of childhood undernutrition in Brazilian municipalities?
+
+Our analysis show that the SPEI **[does not]{.brand-red}** significantly improve the prediction of childhood undernutrition in Brazilian municipalities. The adjusted R-squared values indicate that the inclusion of the SPEI in the models does not significantly improve the prediction of the nutritional status of children under five years old in the municipalities.
 
 ## Acknowledgments
 

@@ -126,20 +126,6 @@ tabset_panel_gam_by_misfs <- function(
         summarise_gam_misfs({i_var})
       ```
 
-      ::: {{#tbl-{i_var_fix}-coef-stats{suffix}}}
-      ```{{r}}
-      #| output: asis
-
-      {i_var} |>
-        summarise_coefs_misfs() |>
-        md_named_tibble()
-      ```
-
-      {i_source}
-
-      Value of the coefficients in the `{i_var}` model.
-      :::
-
       ::: {{#fig-{i_var_fix}-prediction-versus-spei{suffix}}}
       ```{{r}}
       {data_name} |>

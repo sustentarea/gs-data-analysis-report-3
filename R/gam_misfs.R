@@ -71,14 +71,28 @@ summarise_gam_misfs <- function(data, gam_models, n, ci_level = 0.95) {
       tidyr::pivot_longer(dplyr::everything()) |>
       print(n = Inf)
 
-    # cat("\n")
-    #
-    # gam_models[[i]] |>
-    #   mgcv::concurvity(TRUE) |>
-    #   as.data.frame() |>
-    #   tibble::rownames_to_column("names") |>
-    #   dplyr::as_tibble() |>
-    #   print(n = Inf)
+    cat("\n")
+
+    gam_models[[i]] |>
+      summarise_coefs() |>
+      print(n = Inf)
+
+    rhs_formula <-
+      gam_models[[i]] |>
+      magrittr::extract2("formula") |>
+      magrittr::extract(3) |>
+      as.character()
+
+    if (stringr::str_detect(rhs_formula, ".*\\(")) {
+      cat("\n")
+
+      gam_models[[i]] |>
+        mgcv::concurvity(TRUE) |>
+        as.data.frame() |>
+        tibble::rownames_to_column("names") |>
+        dplyr::as_tibble() |>
+        print(n = Inf)
+    }
   }
 
   options(pillar.sigfig = pillar_sigfig)

@@ -3,7 +3,7 @@
 :::: {.panel-tabset}
 ##### `year`
 
-::: {#tbl-var-distribution-freqs-year-3356}
+::: {#tbl-var-distribution-freqs-year-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -22,7 +22,7 @@ data_misfs_a |>
 Frequencies of the `year` variable.
 :::
 
-::: {#fig-var-distribution-charts-year-3356}
+::: {#fig-var-distribution-charts-year-2562}
 ```{r}
 #| code-fold: true
 
@@ -40,7 +40,7 @@ Bar plot of the `year` variable.
 
 ##### `misf`
 
-::: {#tbl-var-distribution-freqs-misf-3356}
+::: {#tbl-var-distribution-freqs-misf-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -59,7 +59,7 @@ data_misfs_a |>
 Frequencies of the `misf` variable.
 :::
 
-::: {#fig-var-distribution-charts-misf-3356}
+::: {#fig-var-distribution-charts-misf-2562}
 ```{r}
 #| code-fold: true
 
@@ -77,7 +77,7 @@ Bar plot of the `misf` variable.
 
 ##### `number_of_children`
 
-::: {#tbl-var-distribution-stats-number-of-children-3356}
+::: {#tbl-var-distribution-stats-number-of-children-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -96,7 +96,7 @@ data_misfs_a |>
 Statistics for the `number_of_children` variable.
 :::
 
-::: {#fig-var-distribution-charts-number-of-children-3356}
+::: {#fig-var-distribution-charts-number-of-children-2562}
 ```{r}
 #| code-fold: true
 
@@ -114,7 +114,7 @@ Histogram of the `number_of_children` variable with a kernel density estimate, a
 
 ##### `sisvan_cover`
 
-::: {#tbl-var-distribution-stats-sisvan-cover-3356}
+::: {#tbl-var-distribution-stats-sisvan-cover-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -133,7 +133,7 @@ data_misfs_a |>
 Statistics for the `sisvan_cover` variable.
 :::
 
-::: {#fig-var-distribution-charts-sisvan-cover-3356}
+::: {#fig-var-distribution-charts-sisvan-cover-2562}
 ```{r}
 #| code-fold: true
 
@@ -151,7 +151,7 @@ Histogram of the `sisvan_cover` variable with a kernel density estimate, a quant
 
 ##### `mbepr`
 
-::: {#tbl-var-distribution-stats-mbepr-3356}
+::: {#tbl-var-distribution-stats-mbepr-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -170,7 +170,7 @@ data_misfs_a |>
 Statistics for the `mbepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-3356}
+::: {#fig-var-distribution-charts-mbepr-2562}
 ```{r}
 #| code-fold: true
 
@@ -188,7 +188,7 @@ Histogram of the `mbepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `beipr`
 
-::: {#tbl-var-distribution-stats-beipr-3356}
+::: {#tbl-var-distribution-stats-beipr-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -207,7 +207,7 @@ data_misfs_a |>
 Statistics for the `beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-beipr-3356}
+::: {#fig-var-distribution-charts-beipr-2562}
 ```{r}
 #| code-fold: true
 
@@ -225,7 +225,7 @@ Histogram of the `beipr` variable with a kernel density estimate, a quantile-qua
 
 ##### `mbepr_beipr`
 
-::: {#tbl-var-distribution-stats-mbepr-beipr-3356}
+::: {#tbl-var-distribution-stats-mbepr-beipr-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -244,7 +244,7 @@ data_misfs_a |>
 Statistics for the `mbepr_beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-beipr-3356}
+::: {#fig-var-distribution-charts-mbepr-beipr-2562}
 ```{r}
 #| code-fold: true
 
@@ -262,7 +262,7 @@ Histogram of the `mbepr_beipr` variable with a kernel density estimate, a quanti
 
 ##### `maper`
 
-::: {#tbl-var-distribution-stats-maper-3356}
+::: {#tbl-var-distribution-stats-maper-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -281,7 +281,7 @@ data_misfs_a |>
 Statistics for the `maper` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-3356}
+::: {#fig-var-distribution-charts-maper-2562}
 ```{r}
 #| code-fold: true
 
@@ -299,7 +299,7 @@ Histogram of the `maper` variable with a kernel density estimate, a quantile-qua
 
 ##### `mpepr`
 
-::: {#tbl-var-distribution-stats-mpepr-3356}
+::: {#tbl-var-distribution-stats-mpepr-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -318,7 +318,7 @@ data_misfs_a |>
 Statistics for the `mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mpepr-3356}
+::: {#fig-var-distribution-charts-mpepr-2562}
 ```{r}
 #| code-fold: true
 
@@ -336,7 +336,7 @@ Histogram of the `mpepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `maper_mpepr`
 
-::: {#tbl-var-distribution-stats-maper-mpepr-3356}
+::: {#tbl-var-distribution-stats-maper-mpepr-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -355,7 +355,7 @@ data_misfs_a |>
 Statistics for the `maper_mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-mpepr-3356}
+::: {#fig-var-distribution-charts-maper-mpepr-2562}
 ```{r}
 #| code-fold: true
 
@@ -373,7 +373,7 @@ Histogram of the `maper_mpepr` variable with a kernel density estimate, a quanti
 
 ##### `gini_index`
 
-::: {#tbl-var-distribution-stats-gini-index-3356}
+::: {#tbl-var-distribution-stats-gini-index-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -392,7 +392,7 @@ data_misfs_a |>
 Statistics for the `gini_index` variable.
 :::
 
-::: {#fig-var-distribution-charts-gini-index-3356}
+::: {#fig-var-distribution-charts-gini-index-2562}
 ```{r}
 #| code-fold: true
 
@@ -410,7 +410,7 @@ Histogram of the `gini_index` variable with a kernel density estimate, a quantil
 
 ##### `gdp_per_capita`
 
-::: {#tbl-var-distribution-stats-gdp-per-capita-3356}
+::: {#tbl-var-distribution-stats-gdp-per-capita-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -429,7 +429,7 @@ data_misfs_a |>
 Statistics for the `gdp_per_capita` variable.
 :::
 
-::: {#fig-var-distribution-charts-gdp-per-capita-3356}
+::: {#fig-var-distribution-charts-gdp-per-capita-2562}
 ```{r}
 #| code-fold: true
 
@@ -447,7 +447,7 @@ Histogram of the `gdp_per_capita` variable with a kernel density estimate, a qua
 
 ##### `spei_12m`
 
-::: {#tbl-var-distribution-stats-spei-12m-3356}
+::: {#tbl-var-distribution-stats-spei-12m-2562}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -466,7 +466,7 @@ data_misfs_a |>
 Statistics for the `spei_12m` variable.
 :::
 
-::: {#fig-var-distribution-charts-spei-12m-3356}
+::: {#fig-var-distribution-charts-spei-12m-2562}
 ```{r}
 #| code-fold: true
 
@@ -488,7 +488,7 @@ Histogram of the `spei_12m` variable with a kernel density estimate, a quantile-
 :::: {.panel-tabset}
 ##### `year`
 
-::: {#tbl-var-distribution-freqs-year-3112}
+::: {#tbl-var-distribution-freqs-year-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -507,7 +507,7 @@ data_misfs_b |>
 Frequencies of the `year` variable.
 :::
 
-::: {#fig-var-distribution-charts-year-3112}
+::: {#fig-var-distribution-charts-year-8034}
 ```{r}
 #| code-fold: true
 
@@ -525,7 +525,7 @@ Bar plot of the `year` variable.
 
 ##### `misf`
 
-::: {#tbl-var-distribution-freqs-misf-3112}
+::: {#tbl-var-distribution-freqs-misf-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -544,7 +544,7 @@ data_misfs_b |>
 Frequencies of the `misf` variable.
 :::
 
-::: {#fig-var-distribution-charts-misf-3112}
+::: {#fig-var-distribution-charts-misf-8034}
 ```{r}
 #| code-fold: true
 
@@ -562,7 +562,7 @@ Bar plot of the `misf` variable.
 
 ##### `number_of_children`
 
-::: {#tbl-var-distribution-stats-number-of-children-3112}
+::: {#tbl-var-distribution-stats-number-of-children-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -581,7 +581,7 @@ data_misfs_b |>
 Statistics for the `number_of_children` variable.
 :::
 
-::: {#fig-var-distribution-charts-number-of-children-3112}
+::: {#fig-var-distribution-charts-number-of-children-8034}
 ```{r}
 #| code-fold: true
 
@@ -599,7 +599,7 @@ Histogram of the `number_of_children` variable with a kernel density estimate, a
 
 ##### `sisvan_cover`
 
-::: {#tbl-var-distribution-stats-sisvan-cover-3112}
+::: {#tbl-var-distribution-stats-sisvan-cover-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -618,7 +618,7 @@ data_misfs_b |>
 Statistics for the `sisvan_cover` variable.
 :::
 
-::: {#fig-var-distribution-charts-sisvan-cover-3112}
+::: {#fig-var-distribution-charts-sisvan-cover-8034}
 ```{r}
 #| code-fold: true
 
@@ -636,7 +636,7 @@ Histogram of the `sisvan_cover` variable with a kernel density estimate, a quant
 
 ##### `mbepr`
 
-::: {#tbl-var-distribution-stats-mbepr-3112}
+::: {#tbl-var-distribution-stats-mbepr-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -655,7 +655,7 @@ data_misfs_b |>
 Statistics for the `mbepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-3112}
+::: {#fig-var-distribution-charts-mbepr-8034}
 ```{r}
 #| code-fold: true
 
@@ -673,7 +673,7 @@ Histogram of the `mbepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `beipr`
 
-::: {#tbl-var-distribution-stats-beipr-3112}
+::: {#tbl-var-distribution-stats-beipr-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -692,7 +692,7 @@ data_misfs_b |>
 Statistics for the `beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-beipr-3112}
+::: {#fig-var-distribution-charts-beipr-8034}
 ```{r}
 #| code-fold: true
 
@@ -710,7 +710,7 @@ Histogram of the `beipr` variable with a kernel density estimate, a quantile-qua
 
 ##### `mbepr_beipr`
 
-::: {#tbl-var-distribution-stats-mbepr-beipr-3112}
+::: {#tbl-var-distribution-stats-mbepr-beipr-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -729,7 +729,7 @@ data_misfs_b |>
 Statistics for the `mbepr_beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-beipr-3112}
+::: {#fig-var-distribution-charts-mbepr-beipr-8034}
 ```{r}
 #| code-fold: true
 
@@ -747,7 +747,7 @@ Histogram of the `mbepr_beipr` variable with a kernel density estimate, a quanti
 
 ##### `maper`
 
-::: {#tbl-var-distribution-stats-maper-3112}
+::: {#tbl-var-distribution-stats-maper-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -766,7 +766,7 @@ data_misfs_b |>
 Statistics for the `maper` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-3112}
+::: {#fig-var-distribution-charts-maper-8034}
 ```{r}
 #| code-fold: true
 
@@ -784,7 +784,7 @@ Histogram of the `maper` variable with a kernel density estimate, a quantile-qua
 
 ##### `mpepr`
 
-::: {#tbl-var-distribution-stats-mpepr-3112}
+::: {#tbl-var-distribution-stats-mpepr-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -803,7 +803,7 @@ data_misfs_b |>
 Statistics for the `mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mpepr-3112}
+::: {#fig-var-distribution-charts-mpepr-8034}
 ```{r}
 #| code-fold: true
 
@@ -821,7 +821,7 @@ Histogram of the `mpepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `maper_mpepr`
 
-::: {#tbl-var-distribution-stats-maper-mpepr-3112}
+::: {#tbl-var-distribution-stats-maper-mpepr-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -840,7 +840,7 @@ data_misfs_b |>
 Statistics for the `maper_mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-mpepr-3112}
+::: {#fig-var-distribution-charts-maper-mpepr-8034}
 ```{r}
 #| code-fold: true
 
@@ -858,7 +858,7 @@ Histogram of the `maper_mpepr` variable with a kernel density estimate, a quanti
 
 ##### `gini_index`
 
-::: {#tbl-var-distribution-stats-gini-index-3112}
+::: {#tbl-var-distribution-stats-gini-index-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -877,7 +877,7 @@ data_misfs_b |>
 Statistics for the `gini_index` variable.
 :::
 
-::: {#fig-var-distribution-charts-gini-index-3112}
+::: {#fig-var-distribution-charts-gini-index-8034}
 ```{r}
 #| code-fold: true
 
@@ -895,7 +895,7 @@ Histogram of the `gini_index` variable with a kernel density estimate, a quantil
 
 ##### `gdp_per_capita`
 
-::: {#tbl-var-distribution-stats-gdp-per-capita-3112}
+::: {#tbl-var-distribution-stats-gdp-per-capita-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -914,7 +914,7 @@ data_misfs_b |>
 Statistics for the `gdp_per_capita` variable.
 :::
 
-::: {#fig-var-distribution-charts-gdp-per-capita-3112}
+::: {#fig-var-distribution-charts-gdp-per-capita-8034}
 ```{r}
 #| code-fold: true
 
@@ -932,7 +932,7 @@ Histogram of the `gdp_per_capita` variable with a kernel density estimate, a qua
 
 ##### `spei_12m`
 
-::: {#tbl-var-distribution-stats-spei-12m-3112}
+::: {#tbl-var-distribution-stats-spei-12m-8034}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -951,7 +951,7 @@ data_misfs_b |>
 Statistics for the `spei_12m` variable.
 :::
 
-::: {#fig-var-distribution-charts-spei-12m-3112}
+::: {#fig-var-distribution-charts-spei-12m-8034}
 ```{r}
 #| code-fold: true
 
@@ -973,7 +973,7 @@ Histogram of the `spei_12m` variable with a kernel density estimate, a quantile-
 :::: {.panel-tabset}
 ##### `year`
 
-::: {#tbl-var-distribution-freqs-year-4893}
+::: {#tbl-var-distribution-freqs-year-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -992,7 +992,7 @@ data_misfs_c |>
 Frequencies of the `year` variable.
 :::
 
-::: {#fig-var-distribution-charts-year-4893}
+::: {#fig-var-distribution-charts-year-8540}
 ```{r}
 #| code-fold: true
 
@@ -1010,7 +1010,7 @@ Bar plot of the `year` variable.
 
 ##### `misf`
 
-::: {#tbl-var-distribution-freqs-misf-4893}
+::: {#tbl-var-distribution-freqs-misf-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1029,7 +1029,7 @@ data_misfs_c |>
 Frequencies of the `misf` variable.
 :::
 
-::: {#fig-var-distribution-charts-misf-4893}
+::: {#fig-var-distribution-charts-misf-8540}
 ```{r}
 #| code-fold: true
 
@@ -1047,7 +1047,7 @@ Bar plot of the `misf` variable.
 
 ##### `number_of_children`
 
-::: {#tbl-var-distribution-stats-number-of-children-4893}
+::: {#tbl-var-distribution-stats-number-of-children-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1066,7 +1066,7 @@ data_misfs_c |>
 Statistics for the `number_of_children` variable.
 :::
 
-::: {#fig-var-distribution-charts-number-of-children-4893}
+::: {#fig-var-distribution-charts-number-of-children-8540}
 ```{r}
 #| code-fold: true
 
@@ -1084,7 +1084,7 @@ Histogram of the `number_of_children` variable with a kernel density estimate, a
 
 ##### `sisvan_cover`
 
-::: {#tbl-var-distribution-stats-sisvan-cover-4893}
+::: {#tbl-var-distribution-stats-sisvan-cover-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1103,7 +1103,7 @@ data_misfs_c |>
 Statistics for the `sisvan_cover` variable.
 :::
 
-::: {#fig-var-distribution-charts-sisvan-cover-4893}
+::: {#fig-var-distribution-charts-sisvan-cover-8540}
 ```{r}
 #| code-fold: true
 
@@ -1121,7 +1121,7 @@ Histogram of the `sisvan_cover` variable with a kernel density estimate, a quant
 
 ##### `mbepr`
 
-::: {#tbl-var-distribution-stats-mbepr-4893}
+::: {#tbl-var-distribution-stats-mbepr-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1140,7 +1140,7 @@ data_misfs_c |>
 Statistics for the `mbepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-4893}
+::: {#fig-var-distribution-charts-mbepr-8540}
 ```{r}
 #| code-fold: true
 
@@ -1158,7 +1158,7 @@ Histogram of the `mbepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `beipr`
 
-::: {#tbl-var-distribution-stats-beipr-4893}
+::: {#tbl-var-distribution-stats-beipr-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1177,7 +1177,7 @@ data_misfs_c |>
 Statistics for the `beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-beipr-4893}
+::: {#fig-var-distribution-charts-beipr-8540}
 ```{r}
 #| code-fold: true
 
@@ -1195,7 +1195,7 @@ Histogram of the `beipr` variable with a kernel density estimate, a quantile-qua
 
 ##### `mbepr_beipr`
 
-::: {#tbl-var-distribution-stats-mbepr-beipr-4893}
+::: {#tbl-var-distribution-stats-mbepr-beipr-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1214,7 +1214,7 @@ data_misfs_c |>
 Statistics for the `mbepr_beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-beipr-4893}
+::: {#fig-var-distribution-charts-mbepr-beipr-8540}
 ```{r}
 #| code-fold: true
 
@@ -1232,7 +1232,7 @@ Histogram of the `mbepr_beipr` variable with a kernel density estimate, a quanti
 
 ##### `maper`
 
-::: {#tbl-var-distribution-stats-maper-4893}
+::: {#tbl-var-distribution-stats-maper-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1251,7 +1251,7 @@ data_misfs_c |>
 Statistics for the `maper` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-4893}
+::: {#fig-var-distribution-charts-maper-8540}
 ```{r}
 #| code-fold: true
 
@@ -1269,7 +1269,7 @@ Histogram of the `maper` variable with a kernel density estimate, a quantile-qua
 
 ##### `mpepr`
 
-::: {#tbl-var-distribution-stats-mpepr-4893}
+::: {#tbl-var-distribution-stats-mpepr-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1288,7 +1288,7 @@ data_misfs_c |>
 Statistics for the `mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mpepr-4893}
+::: {#fig-var-distribution-charts-mpepr-8540}
 ```{r}
 #| code-fold: true
 
@@ -1306,7 +1306,7 @@ Histogram of the `mpepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `maper_mpepr`
 
-::: {#tbl-var-distribution-stats-maper-mpepr-4893}
+::: {#tbl-var-distribution-stats-maper-mpepr-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1325,7 +1325,7 @@ data_misfs_c |>
 Statistics for the `maper_mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-mpepr-4893}
+::: {#fig-var-distribution-charts-maper-mpepr-8540}
 ```{r}
 #| code-fold: true
 
@@ -1343,7 +1343,7 @@ Histogram of the `maper_mpepr` variable with a kernel density estimate, a quanti
 
 ##### `gini_index`
 
-::: {#tbl-var-distribution-stats-gini-index-4893}
+::: {#tbl-var-distribution-stats-gini-index-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1362,7 +1362,7 @@ data_misfs_c |>
 Statistics for the `gini_index` variable.
 :::
 
-::: {#fig-var-distribution-charts-gini-index-4893}
+::: {#fig-var-distribution-charts-gini-index-8540}
 ```{r}
 #| code-fold: true
 
@@ -1380,7 +1380,7 @@ Histogram of the `gini_index` variable with a kernel density estimate, a quantil
 
 ##### `gdp_per_capita`
 
-::: {#tbl-var-distribution-stats-gdp-per-capita-4893}
+::: {#tbl-var-distribution-stats-gdp-per-capita-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1399,7 +1399,7 @@ data_misfs_c |>
 Statistics for the `gdp_per_capita` variable.
 :::
 
-::: {#fig-var-distribution-charts-gdp-per-capita-4893}
+::: {#fig-var-distribution-charts-gdp-per-capita-8540}
 ```{r}
 #| code-fold: true
 
@@ -1417,7 +1417,7 @@ Histogram of the `gdp_per_capita` variable with a kernel density estimate, a qua
 
 ##### `spei_12m`
 
-::: {#tbl-var-distribution-stats-spei-12m-4893}
+::: {#tbl-var-distribution-stats-spei-12m-8540}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1436,7 +1436,7 @@ data_misfs_c |>
 Statistics for the `spei_12m` variable.
 :::
 
-::: {#fig-var-distribution-charts-spei-12m-4893}
+::: {#fig-var-distribution-charts-spei-12m-8540}
 ```{r}
 #| code-fold: true
 
@@ -1458,7 +1458,7 @@ Histogram of the `spei_12m` variable with a kernel density estimate, a quantile-
 :::: {.panel-tabset}
 ##### `year`
 
-::: {#tbl-var-distribution-freqs-year-7166}
+::: {#tbl-var-distribution-freqs-year-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1477,7 +1477,7 @@ data_misfs_d |>
 Frequencies of the `year` variable.
 :::
 
-::: {#fig-var-distribution-charts-year-7166}
+::: {#fig-var-distribution-charts-year-8574}
 ```{r}
 #| code-fold: true
 
@@ -1495,7 +1495,7 @@ Bar plot of the `year` variable.
 
 ##### `misf`
 
-::: {#tbl-var-distribution-freqs-misf-7166}
+::: {#tbl-var-distribution-freqs-misf-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1514,7 +1514,7 @@ data_misfs_d |>
 Frequencies of the `misf` variable.
 :::
 
-::: {#fig-var-distribution-charts-misf-7166}
+::: {#fig-var-distribution-charts-misf-8574}
 ```{r}
 #| code-fold: true
 
@@ -1532,7 +1532,7 @@ Bar plot of the `misf` variable.
 
 ##### `number_of_children`
 
-::: {#tbl-var-distribution-stats-number-of-children-7166}
+::: {#tbl-var-distribution-stats-number-of-children-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1551,7 +1551,7 @@ data_misfs_d |>
 Statistics for the `number_of_children` variable.
 :::
 
-::: {#fig-var-distribution-charts-number-of-children-7166}
+::: {#fig-var-distribution-charts-number-of-children-8574}
 ```{r}
 #| code-fold: true
 
@@ -1569,7 +1569,7 @@ Histogram of the `number_of_children` variable with a kernel density estimate, a
 
 ##### `sisvan_cover`
 
-::: {#tbl-var-distribution-stats-sisvan-cover-7166}
+::: {#tbl-var-distribution-stats-sisvan-cover-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1588,7 +1588,7 @@ data_misfs_d |>
 Statistics for the `sisvan_cover` variable.
 :::
 
-::: {#fig-var-distribution-charts-sisvan-cover-7166}
+::: {#fig-var-distribution-charts-sisvan-cover-8574}
 ```{r}
 #| code-fold: true
 
@@ -1606,7 +1606,7 @@ Histogram of the `sisvan_cover` variable with a kernel density estimate, a quant
 
 ##### `mbepr`
 
-::: {#tbl-var-distribution-stats-mbepr-7166}
+::: {#tbl-var-distribution-stats-mbepr-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1625,7 +1625,7 @@ data_misfs_d |>
 Statistics for the `mbepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-7166}
+::: {#fig-var-distribution-charts-mbepr-8574}
 ```{r}
 #| code-fold: true
 
@@ -1643,7 +1643,7 @@ Histogram of the `mbepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `beipr`
 
-::: {#tbl-var-distribution-stats-beipr-7166}
+::: {#tbl-var-distribution-stats-beipr-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1662,7 +1662,7 @@ data_misfs_d |>
 Statistics for the `beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-beipr-7166}
+::: {#fig-var-distribution-charts-beipr-8574}
 ```{r}
 #| code-fold: true
 
@@ -1680,7 +1680,7 @@ Histogram of the `beipr` variable with a kernel density estimate, a quantile-qua
 
 ##### `mbepr_beipr`
 
-::: {#tbl-var-distribution-stats-mbepr-beipr-7166}
+::: {#tbl-var-distribution-stats-mbepr-beipr-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1699,7 +1699,7 @@ data_misfs_d |>
 Statistics for the `mbepr_beipr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mbepr-beipr-7166}
+::: {#fig-var-distribution-charts-mbepr-beipr-8574}
 ```{r}
 #| code-fold: true
 
@@ -1717,7 +1717,7 @@ Histogram of the `mbepr_beipr` variable with a kernel density estimate, a quanti
 
 ##### `maper`
 
-::: {#tbl-var-distribution-stats-maper-7166}
+::: {#tbl-var-distribution-stats-maper-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1736,7 +1736,7 @@ data_misfs_d |>
 Statistics for the `maper` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-7166}
+::: {#fig-var-distribution-charts-maper-8574}
 ```{r}
 #| code-fold: true
 
@@ -1754,7 +1754,7 @@ Histogram of the `maper` variable with a kernel density estimate, a quantile-qua
 
 ##### `mpepr`
 
-::: {#tbl-var-distribution-stats-mpepr-7166}
+::: {#tbl-var-distribution-stats-mpepr-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1773,7 +1773,7 @@ data_misfs_d |>
 Statistics for the `mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-mpepr-7166}
+::: {#fig-var-distribution-charts-mpepr-8574}
 ```{r}
 #| code-fold: true
 
@@ -1791,7 +1791,7 @@ Histogram of the `mpepr` variable with a kernel density estimate, a quantile-qua
 
 ##### `maper_mpepr`
 
-::: {#tbl-var-distribution-stats-maper-mpepr-7166}
+::: {#tbl-var-distribution-stats-maper-mpepr-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1810,7 +1810,7 @@ data_misfs_d |>
 Statistics for the `maper_mpepr` variable.
 :::
 
-::: {#fig-var-distribution-charts-maper-mpepr-7166}
+::: {#fig-var-distribution-charts-maper-mpepr-8574}
 ```{r}
 #| code-fold: true
 
@@ -1828,7 +1828,7 @@ Histogram of the `maper_mpepr` variable with a kernel density estimate, a quanti
 
 ##### `gini_index`
 
-::: {#tbl-var-distribution-stats-gini-index-7166}
+::: {#tbl-var-distribution-stats-gini-index-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1847,7 +1847,7 @@ data_misfs_d |>
 Statistics for the `gini_index` variable.
 :::
 
-::: {#fig-var-distribution-charts-gini-index-7166}
+::: {#fig-var-distribution-charts-gini-index-8574}
 ```{r}
 #| code-fold: true
 
@@ -1865,7 +1865,7 @@ Histogram of the `gini_index` variable with a kernel density estimate, a quantil
 
 ##### `gdp_per_capita`
 
-::: {#tbl-var-distribution-stats-gdp-per-capita-7166}
+::: {#tbl-var-distribution-stats-gdp-per-capita-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1884,7 +1884,7 @@ data_misfs_d |>
 Statistics for the `gdp_per_capita` variable.
 :::
 
-::: {#fig-var-distribution-charts-gdp-per-capita-7166}
+::: {#fig-var-distribution-charts-gdp-per-capita-8574}
 ```{r}
 #| code-fold: true
 
@@ -1902,7 +1902,7 @@ Histogram of the `gdp_per_capita` variable with a kernel density estimate, a qua
 
 ##### `spei_12m`
 
-::: {#tbl-var-distribution-stats-spei-12m-7166}
+::: {#tbl-var-distribution-stats-spei-12m-8574}
 ```{r}
 #| code-fold: true
 #| output: asis
@@ -1921,7 +1921,7 @@ data_misfs_d |>
 Statistics for the `spei_12m` variable.
 :::
 
-::: {#fig-var-distribution-charts-spei-12m-7166}
+::: {#fig-var-distribution-charts-spei-12m-8574}
 ```{r}
 #| code-fold: true
 
